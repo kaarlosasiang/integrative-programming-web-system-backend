@@ -16,6 +16,7 @@ class Student extends Controller
 		switch ($requestMethod) {
 			case "POST": {
 					$this->create();
+					break;
 				}
 			case "GET": {
 					if (array_key_exists("id", $_GET) || !empty($_GET["id"])) {
@@ -23,12 +24,19 @@ class Student extends Controller
 					} else {
 						$this->all();
 					}
+					break;
 				}
 			case "PATCH": {
 					$this->update();
+					break;
 				}
 			case "DELETE": {
 					$this->delete();
+					break;
+				}
+			default: {
+					response(400, false, ["message" => "Request method: {$requestMethod} not allowed!"]);
+					break;
 				}
 		}
 	}
@@ -91,6 +99,19 @@ class Student extends Controller
 
 		response(200, true, $results);
 	}
+	public function search()
+	{
+		$query = $_GET["query"] ? $_GET["query"] : null;
+
+		$results = StudentModel::find($query, "full_name");
+
+		if (!$results) {
+			response(404, false, ["message" => "Student not found!"]);
+			exit;
+		}
+
+		response(200, true, $results);
+	}
 	public function all()
 	{
 		$results = StudentModel::all();
@@ -130,9 +151,60 @@ class Student extends Controller
 	}
 	public function update()
 	{
+		$data = json_decode(file_get_contents("php://input"));
+
+		$student_id = $_GET["id"] ? $_GET["id"] : null;
+
+		//set json data from request body
+		$firstname = $data->firstname;
+		$lastname = $data->lastname;
+		$middlename = $data->middlename;
+		$birthday = $data->birthday;
+		$gender = $data->gender;
+		$street = $data->street;
+		$barangay = $data->barangay;
+		$municipality = $data->municipality;
+		$province = $data->province;
+		$zipcode = $data->zipcode;
+		$contact = $data->contact;
+		$course = $data->course;
+		$institute = $data->institute;
+		$guardian_name = $data->guardian_name;
+		$guardian_contact = $data->guardian_contact;
+		$guardian_address = $data->guardian_address;
+
+		Controller::verifyJsonData($data);
+
+		if (!StudentModel::find($student_id, "student_id")) {
+			response(404, false, ["message" => "Student not found!"]);
+			exit;
+		}
+
+		$result = StudentModel::update($student_id, $firstname, $lastname, $middlename, $birthday, $gender, $street, $barangay, $municipality, $province, $zipcode, $contact, $institute, $course, $guardian_name, $guardian_contact, $guardian_address);
+
+		if (!$result) {
+			response(400, false, ["message" => "Update failed!"]);
+			exit;
+		} else {
+			response(201, true, ["message" => "Update successfull!"]);
+		}
 	}
 	public function delete()
 	{
+		$studentId = $_GET["id"] ? $_GET["id"] : null;
+
+		$results = StudentModel::find($studentId, "student_id");
+
+		if (!$results) {
+			response(404, false, ["message" => "Student not found!"]);
+			exit;
+		}
+
+		if (StudentModel::delete($studentId, "student_id")) {
+			response(200, true, ["message" => "Delete successful"]);
+		} else {
+			response(400, false, ["message" => "Delete Failed!"]);
+		}
 	}
 }
 new Student();

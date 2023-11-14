@@ -2,6 +2,8 @@
 
 namespace api;
 
+use model\StudentModel;
+
 require_once(__DIR__ . "/../util/header.php");
 require_once(__DIR__ . "/../util/util.php");
 
@@ -36,6 +38,15 @@ class Controller
 
 		// Concatenate the current year and incremented number with a hyphen
 		$idNumber = $currentYear . '-' . $incrementedNumber;
+
+		if (StudentModel::find($idNumber, "student_id")) {
+			$recordCount = ++$recordCount;
+
+			$incrementedNumber = sprintf("%04d", $recordCount);
+
+			$idNumber = $currentYear . '-' . $incrementedNumber;
+			return $idNumber;
+		}
 		return $idNumber;
 	}
 }

@@ -58,11 +58,40 @@ class StudentModel
 			$stmt->bindParam(":guardianContact", $guardianContact);
 			$stmt->bindParam(":guardianAddress", $guardianAddress);
 
+			$result = $stmt->execute() ? true : false;
+			return $result;
+		} catch (PDOException $e) {
+			$response = [
+				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+			];
+			response(500, false, $response);
+			exit;
+		}
+	}
+	/**
+	 * Perform fetch operation strictly  based on the condition
+	 * @return null if condition is not found
+	 * @return array result
+	 */
+	public static function find($column, $condition)
+	{
+		try {
+			//query statement
+			$query = "SELECT * FROM " . self::TABLE . " WHERE $condition = :$condition";
 
-			if ($stmt->execute()) {
-				response(201, true, ["message" => "Student Registered Successfully!"]);
+			//prepared statement
+			$stmt = Database::connect()->prepare($query);
+
+			$stmt->bindParam(":$condition", $column);
+			$stmt->execute();
+			//verifies if there's a returned value
+			if ($stmt->rowCount() == 0) {
+				return null;
 				exit;
 			}
+			//fetch and return result
+			$result = $stmt->fetch();
+			return $result;
 		} catch (PDOException $e) {
 			$response = [
 				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
@@ -76,7 +105,7 @@ class StudentModel
 	 * @return null if condition is not found
 	 * @return array result
 	 */
-	public static function find($column, $condition)
+	public static function search($column, $condition)
 	{
 		try {
 			//query statement
@@ -84,7 +113,7 @@ class StudentModel
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
-			//generate search pattern
+
 			$searchPattern = "%" . $column . "%";
 			$stmt->bindParam(":$condition", $searchPattern);
 			$stmt->execute();
@@ -105,7 +134,7 @@ class StudentModel
 		}
 	}
 	/**
-	 * Fetch all data from database
+	 * Fetch all data from resource
 	 *
 	 */
 	public static function all()
@@ -179,11 +208,8 @@ class StudentModel
 			$stmt->bindParam(":guardianContact", $guardianContact);
 			$stmt->bindParam(":guardianAddress", $guardianAddress);
 
-			if ($stmt->execute()) {
-				response(201, true, ["message" => "Update successful"]);
-			} else {
-				response(201, true, ["message" => "Update failed"]);
-			}
+			$result = $stmt->execute() ? true : false;
+			return $result;
 		} catch (PDOException $e) {
 			$response = [
 				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
@@ -206,12 +232,10 @@ class StudentModel
 
 			$stmt->bindParam(":$condition", $column);
 
-			if ($stmt->execute()) {
-				response(201, true, ["message" => "Delete successful"]);
-				exit;
-			} else {
-				response(201, true, ["message" => "Delete failed"]);
-			}
+
+			$result = $stmt->execute() ? true : false;
+
+			return $result;
 		} catch (PDOException $e) {
 			$response = [
 				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
