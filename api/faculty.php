@@ -7,7 +7,7 @@ use model\FacultyModel;
 require_once(__DIR__ . "/../model/FacultyModel.php");
 require_once(__DIR__ . "/Controller.php");
 
-class Student extends Controller
+class Faculty extends Controller
 {
 	public function __construct()
 	{
@@ -172,4 +172,4 @@ class Student extends Controller
 		}
 	}
 }
-new Student();
+new Faculty();

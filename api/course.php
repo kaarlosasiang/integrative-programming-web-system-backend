@@ -2,12 +2,12 @@
 
 namespace api;
 
-use model\InstituteModel;
+use model\CourseModel;
 
-require_once(__DIR__ . "/../model/InstituteModel.php");
+require_once(__DIR__ . "/../model/CourseModel.php");
 require_once(__DIR__ . "/Controller.php");
 
-class Institute extends Controller
+class Course extends Controller
 {
 	public function __construct()
 	{
@@ -53,7 +53,7 @@ class Institute extends Controller
 
 		Controller::verifyJsonData($data);
 
-		$result = InstituteModel::create($title, $slug, $description);
+		$result = CourseModel::create($title, $slug, $description);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -66,10 +66,10 @@ class Institute extends Controller
 	{
 		$id = $_GET["id"] ? $_GET["id"] : null;
 
-		$results = InstituteModel::find($id, "id");
+		$results = CourseModel::find($id, "id");
 
 		if (!$results) {
-			response(404, false, ["message" => "Institute not found!"]);
+			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
@@ -79,10 +79,10 @@ class Institute extends Controller
 	{
 		$query = $_GET["query"] ? $_GET["query"] : null;
 
-		$results = InstituteModel::search($query);
+		$results = CourseModel::search($query);
 
 		if (!$results) {
-			response(404, false, ["message" => "Institute not found!"]);
+			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
@@ -90,10 +90,10 @@ class Institute extends Controller
 	}
 	public function all()
 	{
-		$results = InstituteModel::all();
+		$results = CourseModel::all();
 
 		if (!$results) {
-			response(200, false, ["message" => "No registered institute currently"]);
+			response(200, false, ["message" => "No registered course currently"]);
 			exit;
 		}
 
@@ -124,12 +124,12 @@ class Institute extends Controller
 
 		Controller::verifyJsonData($data);
 
-		if (!InstituteModel::find($id, "id")) {
-			response(404, false, ["message" => "Institute not found!"]);
+		if (!CourseModel::find($id, "id")) {
+			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
-		$result = InstituteModel::update($id, $title, $slug, $description);
+		$result = CourseModel::update($id, $title, $slug, $description);
 
 		if (!$result) {
 			response(400, false, ["message" => "Update failed!"]);
@@ -142,18 +142,18 @@ class Institute extends Controller
 	{
 		$id = $_GET["id"] ? $_GET["id"] : null;
 
-		$results = InstituteModel::find($id, "id");
+		$results = CourseModel::find($id, "id");
 
 		if (!$results) {
-			response(404, false, ["message" => "Institute not found!"]);
+			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
-		if (InstituteModel::delete($id, "id")) {
+		if (CourseModel::delete($id, "id")) {
 			response(200, true, ["message" => "Delete successful"]);
 		} else {
 			response(400, false, ["message" => "Delete Failed!"]);
 		}
 	}
 }
-new Institute();
+new Course();
