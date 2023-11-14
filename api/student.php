@@ -21,6 +21,8 @@ class Student extends Controller
 			case "GET": {
 					if (array_key_exists("id", $_GET) || !empty($_GET["id"])) {
 						$this->show();
+					} else if (array_key_exists("query", $_GET) || !empty($_GET["query"])) {
+						$this->search();
 					} else {
 						$this->all();
 					}
@@ -103,14 +105,14 @@ class Student extends Controller
 	{
 		$query = $_GET["query"] ? $_GET["query"] : null;
 
-		$results = StudentModel::find($query, "full_name");
+		$results = StudentModel::search($query);
 
 		if (!$results) {
 			response(404, false, ["message" => "Student not found!"]);
 			exit;
 		}
 
-		response(200, true, $results);
+		response(200, true, ["data" => $results]);
 	}
 	public function all()
 	{

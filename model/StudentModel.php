@@ -105,17 +105,20 @@ class StudentModel
 	 * @return null if condition is not found
 	 * @return array result
 	 */
-	public static function search($column, $condition)
+	public static function search($column)
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE . " WHERE $condition LIKE :$condition";
+			$query = "SELECT * FROM " . self::TABLE . " WHERE first_name LIKE :firstName OR middle_name LIKE :middleName OR last_name LIKE :lastName";
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
 
 			$searchPattern = "%" . $column . "%";
-			$stmt->bindParam(":$condition", $searchPattern);
+			$stmt->bindParam(":firstName", $searchPattern);
+			$stmt->bindParam(":middleName", $searchPattern);
+			$stmt->bindParam(":lastName", $searchPattern);
+
 			$stmt->execute();
 			//verifies if there's a returned value
 			if ($stmt->rowCount() == 0) {
@@ -123,7 +126,7 @@ class StudentModel
 				exit;
 			}
 			//fetch and return result
-			$result = $stmt->fetch();
+			$result = $stmt->fetchAll();
 			return $result;
 		} catch (PDOException $e) {
 			$response = [
