@@ -70,10 +70,8 @@ class StudentModel
 	}
 	/**
 	 * Perform fetch operation strictly  based on the condition
-	 * @return null if condition is not found
-	 * @return array result
 	 */
-	public static function find($column, $condition)
+	public static function find($column, $condition, $fetchAll = false)
 	{
 		try {
 			//query statement
@@ -89,8 +87,11 @@ class StudentModel
 				return null;
 				exit;
 			}
-			//fetch and return result
-			$result = $stmt->fetch();
+			if ($fetchAll === true) {
+				$result = $stmt->fetchAll();
+			} else {
+				$result = $stmt->fetch();
+			}
 			return $result;
 		} catch (PDOException $e) {
 			$response = [
@@ -239,6 +240,31 @@ class StudentModel
 			$result = $stmt->execute() ? true : false;
 
 			return $result;
+		} catch (PDOException $e) {
+			$response = [
+				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+			];
+			response(500, false, $response);
+			exit;
+		}
+	}
+	public static function studentCountByCourse($courses)
+	{
+		try {
+			foreach ($courses as $course) {
+
+				$query = "SELECT * FROM students WHERE course =  :course";
+
+				$stmt = Database::connect()->prepare($query);
+
+				$stmt->bindParam(":course", $course["slug"]);
+				$stmt->execute();
+
+				$rowCount = $stmt->rowCount();
+
+				$returnData[$course["slug"]] = $rowCount;
+			}
+			return $returnData;
 		} catch (PDOException $e) {
 			$response = [
 				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
