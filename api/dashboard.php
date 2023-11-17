@@ -59,7 +59,7 @@ class Dashboard extends Controller
 			"fgbm_count" => $fgbmCount,
 			"fnahs_count" => $fnahsCount,
 			"fted_count" => $ftedCount,
-			"falst_count" => $falsCount,
+			"fals_count" => $falsCount,
 			"student_count_by_course" => $studentCountByCourse
 		]);
 	}
