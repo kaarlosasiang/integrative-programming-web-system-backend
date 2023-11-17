@@ -32,7 +32,7 @@ class Dashboard extends Controller
 	}
 	public function dashBoardData()
 	{
-		$students = StudentModel::all();
+		$students = StudentModel::all(); //array
 		$faculties = FacultyModel::all();
 		$courses = CourseModel::all();
 		$fcdset = StudentModel::find("FCDSET", "institute", true);
@@ -41,7 +41,7 @@ class Dashboard extends Controller
 		$fted = StudentModel::find("FTED", "institute", true);
 		$fals = StudentModel::find("FALS", "institute", true);
 
-		$studentCount = $students == null ? 0 : count($students);
+		$studentCount = $students == null ? 0 : count($students); //if null, returns 0 else count the lenght of the array
 		$facultiesCount = $faculties == null ? 0 : count($faculties);
 		$fcdsetCount = $fcdset == null ? 0 : count($fcdset);
 		$fgbmCount = $fgbm == null ? 0 : count($fgbm);

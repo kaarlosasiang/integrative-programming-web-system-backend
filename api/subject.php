@@ -2,12 +2,12 @@
 
 namespace api;
 
-use model\CourseModel;
+use model\SubjectModel;
 
-require_once(__DIR__ . "/../model/CourseModel.php");
+require_once(__DIR__ . "/../model/SubjectModel.php");
 require_once(__DIR__ . "/Controller.php");
 
-class Course extends Controller
+class Subject extends Controller
 {
 	public function __construct()
 	{
@@ -49,12 +49,14 @@ class Course extends Controller
 		Controller::verifyJsonData($data);
 
 		//set json data from request body
-		$title = $data->title;
-		$slug = $data->slug;
+		$code = $data->code;
 		$description = $data->description;
+		$unit = $data->unit;
+		$type = $data->type;
 
 
-		$result = CourseModel::create($title, $slug, $description);
+
+		$result = SubjectModel::create($code, $description, $unit, $type);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -65,12 +67,12 @@ class Course extends Controller
 	}
 	public function show()
 	{
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
+		$code = isset($_GET["code"]) ? $_GET["code"] : null;
 
-		$results = CourseModel::find($id, "id");
+		$results = SubjectModel::find($code, "code");
 
 		if (!$results) {
-			response(404, false, ["message" => "Course not found!"]);
+			response(404, false, ["message" => "Subject not found!"]);
 			exit;
 		}
 
@@ -80,10 +82,10 @@ class Course extends Controller
 	{
 		$query = isset($_GET["query"]) ? $_GET["query"] : null;
 
-		$results = CourseModel::search($query);
+		$results = SubjectModel::search($query);
 
 		if (!$results) {
-			response(404, false, ["message" => "Course not found!"]);
+			response(404, false, ["message" => "Subject not found!"]);
 			exit;
 		}
 
@@ -91,10 +93,10 @@ class Course extends Controller
 	}
 	public function all()
 	{
-		$results = CourseModel::all();
+		$results = SubjectModel::all();
 
 		if (!$results) {
-			response(200, false, ["message" => "No registered course currently"]);
+			response(200, false, ["message" => "No registered subjects currently"]);
 			exit;
 		}
 
@@ -103,10 +105,10 @@ class Course extends Controller
 		foreach ($results as $result) {
 
 			$returnData[] = [
-				"id" => $result["id"],
-				"title" => $result["title"],
-				"slug" => $result["slug"],
-				"description" => $result["description"]
+				"code" => $result["code"],
+				"description" => $result["description"],
+				"unit" => $result["unit"],
+				"type" => $result["type"]
 			];
 		}
 		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
@@ -117,20 +119,21 @@ class Course extends Controller
 
 		Controller::verifyJsonData($data);
 
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
+		$code = isset($_GET["code"]) ? $_GET["code"] : null;
 
 		//set json data from request body
-		$title = $data->title;
-		$slug = $data->slug;
+		$code = $data->code;
 		$description = $data->description;
+		$unit = $data->unit;
+		$type = $data->type;
 
 
-		if (!CourseModel::find($id, "id")) {
-			response(404, false, ["message" => "Course not found!"]);
+		if (!SubjectModel::find($code, "code")) {
+			response(404, false, ["message" => "Subject not found!"]);
 			exit;
 		}
 
-		$result = CourseModel::update($id, $title, $slug, $description);
+		$result = SubjectModel::update($code, $description, $unit, $type);
 
 		if (!$result) {
 			response(400, false, ["message" => "Update failed!"]);
@@ -141,20 +144,20 @@ class Course extends Controller
 	}
 	public function delete()
 	{
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
+		$code = isset($_GET["code"]) ? $_GET["code"] : null;
 
-		$results = CourseModel::find($id, "id");
+		$results = SubjectModel::find($code, "code");
 
 		if (!$results) {
-			response(404, false, ["message" => "Course not found!"]);
+			response(404, false, ["message" => "Subject not found!"]);
 			exit;
 		}
 
-		if (CourseModel::delete($id, "id")) {
+		if (SubjectModel::delete($code, "co$code")) {
 			response(200, true, ["message" => "Delete successful"]);
 		} else {
 			response(400, false, ["message" => "Delete Failed!"]);
 		}
 	}
 }
-new Course();
+new Subject();

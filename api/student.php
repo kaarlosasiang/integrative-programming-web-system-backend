@@ -46,6 +46,8 @@ class Student extends Controller
 	{
 		$data = json_decode(file_get_contents("php://input"));
 
+		Controller::verifyJsonData($data);
+
 		//set json data from request body
 		$firstname = $data->firstname;
 		$lastname = $data->lastname;
@@ -64,7 +66,7 @@ class Student extends Controller
 		$guardian_contact = $data->guardian_contact;
 		$guardian_address = $data->guardian_address;
 
-		Controller::verifyJsonData($data);
+
 
 		$result = StudentModel::all();
 
@@ -90,7 +92,7 @@ class Student extends Controller
 	}
 	public function show()
 	{
-		$studentId = $_GET["id"] ? $_GET["id"] : null;
+		$studentId = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		$results = StudentModel::find($studentId, "student_id");
 
@@ -103,7 +105,7 @@ class Student extends Controller
 	}
 	public function search()
 	{
-		$query = $_GET["query"] ? $_GET["query"] : null;
+		$query = isset($_GET["query"]) ? $_GET["query"] : null;
 
 		$results = StudentModel::search($query);
 
@@ -127,7 +129,6 @@ class Student extends Controller
 		foreach ($results as $result) {
 
 			$returnData[] = [
-				"row_count" => $numRows,
 				"student_id" => $result["student_id"],
 				"firstname" => $result["first_name"],
 				"lastname" => $result["last_name"],
@@ -149,13 +150,15 @@ class Student extends Controller
 				"updated_at" => $result["updated_at"]
 			];
 		}
-		response(200, true, ["data" => $returnData]);
+		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
 	}
 	public function update()
 	{
 		$data = json_decode(file_get_contents("php://input"));
 
-		$student_id = $_GET["id"] ? $_GET["id"] : null;
+		$student_id = isset($_GET["id"]) ? $_GET["id"] : null;
+
+		Controller::verifyJsonData($data);
 
 		//set json data from request body
 		$firstname = $data->firstname;
@@ -175,7 +178,7 @@ class Student extends Controller
 		$guardian_contact = $data->guardian_contact;
 		$guardian_address = $data->guardian_address;
 
-		Controller::verifyJsonData($data);
+
 
 		if (!StudentModel::find($student_id, "student_id")) {
 			response(404, false, ["message" => "Student not found!"]);
@@ -193,7 +196,7 @@ class Student extends Controller
 	}
 	public function delete()
 	{
-		$studentId = $_GET["id"] ? $_GET["id"] : null;
+		$studentId = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		$results = StudentModel::find($studentId, "student_id");
 

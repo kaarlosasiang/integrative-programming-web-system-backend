@@ -46,6 +46,8 @@ class Faculty extends Controller
 	{
 		$data = json_decode(file_get_contents("php://input"));
 
+		Controller::verifyJsonData($data);
+
 		//set json data from request body
 		$firstname = $data->firstname;
 		$lastname = $data->lastname;
@@ -56,7 +58,6 @@ class Faculty extends Controller
 		$course = $data->course;
 		$institute = $data->institute;
 
-		Controller::verifyJsonData($data);
 
 		$result = FacultyModel::create($firstname, $lastname, $middlename, $birthday, $gender, $contact, $institute, $course);
 
@@ -69,7 +70,7 @@ class Faculty extends Controller
 	}
 	public function show()
 	{
-		$id = $_GET["id"] ? $_GET["id"] : null;
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		$results = FacultyModel::find($id, "id");
 
@@ -82,7 +83,7 @@ class Faculty extends Controller
 	}
 	public function search()
 	{
-		$query = $_GET["query"] ? $_GET["query"] : null;
+		$query = isset($_GET["query"]) ? $_GET["query"] : null;
 
 		$results = FacultyModel::search($query);
 
@@ -106,7 +107,6 @@ class Faculty extends Controller
 		foreach ($results as $result) {
 
 			$returnData[] = [
-				"row_count" => $numRows,
 				"id" => $result["id"],
 				"firstname" => $result["first_name"],
 				"lastname" => $result["last_name"],
@@ -120,13 +120,15 @@ class Faculty extends Controller
 				"updated_at" => $result["updated_at"]
 			];
 		}
-		response(200, true, ["data" => $returnData]);
+		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
 	}
 	public function update()
 	{
 		$data = json_decode(file_get_contents("php://input"));
 
-		$id = $_GET["id"] ? $_GET["id"] : null;
+		Controller::verifyJsonData($data);
+
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		//set json data from request body
 		$firstname = $data->firstname;
@@ -138,7 +140,6 @@ class Faculty extends Controller
 		$course = $data->course;
 		$institute = $data->institute;
 
-		Controller::verifyJsonData($data);
 
 		if (!FacultyModel::find($id, "id")) {
 			response(404, false, ["message" => "Faculty not found!"]);
@@ -156,7 +157,7 @@ class Faculty extends Controller
 	}
 	public function delete()
 	{
-		$id = $_GET["id"] ? $_GET["id"] : null;
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		$results = FacultyModel::find($id, "id");
 

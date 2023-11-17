@@ -46,12 +46,12 @@ class Institute extends Controller
 	{
 		$data = json_decode(file_get_contents("php://input"));
 
+		Controller::verifyJsonData($data);
+
 		//set json data from request body
 		$title = $data->title;
 		$slug = $data->slug;
 		$description = $data->description;
-
-		Controller::verifyJsonData($data);
 
 		$result = InstituteModel::create($title, $slug, $description);
 
@@ -64,7 +64,7 @@ class Institute extends Controller
 	}
 	public function show()
 	{
-		$id = $_GET["id"] ? $_GET["id"] : null;
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		$results = InstituteModel::find($id, "id");
 
@@ -77,7 +77,7 @@ class Institute extends Controller
 	}
 	public function search()
 	{
-		$query = $_GET["query"] ? $_GET["query"] : null;
+		$query = isset($_GET["query"]) ? $_GET["query"] : null;
 
 		$results = InstituteModel::search($query);
 
@@ -102,27 +102,27 @@ class Institute extends Controller
 		foreach ($results as $result) {
 
 			$returnData[] = [
-				"row_count" => $numRows,
 				"id" => $result["id"],
 				"title" => $result["title"],
 				"slug" => $result["slug"],
 				"description" => $result["description"]
 			];
 		}
-		response(200, true, ["data" => $returnData]);
+		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
 	}
 	public function update()
 	{
 		$data = json_decode(file_get_contents("php://input"));
 
-		$id = $_GET["id"] ? $_GET["id"] : null;
+		Controller::verifyJsonData($data);
+
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		//set json data from request body
 		$title = $data->title;
 		$slug = $data->slug;
 		$description = $data->description;
 
-		Controller::verifyJsonData($data);
 
 		if (!InstituteModel::find($id, "id")) {
 			response(404, false, ["message" => "Institute not found!"]);
@@ -140,7 +140,7 @@ class Institute extends Controller
 	}
 	public function delete()
 	{
-		$id = $_GET["id"] ? $_GET["id"] : null;
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		$results = InstituteModel::find($id, "id");
 
