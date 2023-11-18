@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 14, 2023 at 12:02 PM
+-- Generation Time: Nov 18, 2023 at 02:11 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -48,7 +48,8 @@ INSERT INTO `admin` (`user_id`, `first_name`, `last_name`, `birthday`, `gender`,
 (47, 'John', 'Doe', '2023-11-02', 'male', 'john@gmail.com', '09123456789', '$2y$10$PumhXShcT5uQ3eviJ2eINuYL9z5R8kLszjQmL6jzrVVoTpfogv5Fa'),
 (48, 'Jade', 'Lore', '2023-11-02', 'male', 'jade@gmail.com', '09123456789', '$2y$10$AIT3xyYU5NQp.UW/tPzAyeoA/Z4ey/kw7DfWFHAJ6KPmFvcolcfrW'),
 (50, 'Jonathan', 'Dale', '2023-11-03', 'female', 'jonathan@gmail.com', '09123456789', '$2y$10$ZfCw3CLWJr9QS8HayZxsR.lxzxzuyJZP9fOnBNqInKKG2WHWmCdrK'),
-(63, 'Clarence', 'Japinan', '2023-11-03', 'female', 'japinanclarence@gmail.com', '09510312859', '$2y$10$b3EPe88wKHmCQyOvw/nIOOSFw0s.P3kp5/g/F0.lsX3Z5LbvyyNrS');
+(63, 'Clarence', 'Japinan', '2023-11-03', 'female', 'japinanclarence@gmail.com', '09510312859', '$2y$10$b3EPe88wKHmCQyOvw/nIOOSFw0s.P3kp5/g/F0.lsX3Z5LbvyyNrS'),
+(64, 'Roche', 'Santiago', '0000-00-00', '', 'rocheSantiago@gmail.com', NULL, '$2y$10$0mecrEjFBn/qbB0ntsI9tOsJ3oNksykdMSSy76M.TlnjLlG/MgTk2');
 
 -- --------------------------------------------------------
 
@@ -70,7 +71,8 @@ CREATE TABLE `course` (
 --
 
 INSERT INTO `course` (`id`, `title`, `slug`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'Bachelor of Science in Information Technology', 'BSIT', NULL, '2023-11-12 21:51:55', NULL);
+(1, 'Bachelor of Science in Information Technology', 'BSIT', NULL, '2023-11-12 21:51:55', NULL),
+(3, 'Bachelor of Science in Civil Engineering', 'BSCE', '', '2023-11-14 20:03:23', NULL);
 
 -- --------------------------------------------------------
 
@@ -112,7 +114,8 @@ CREATE TABLE `institute` (
 --
 
 INSERT INTO `institute` (`id`, `title`, `slug`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'Faculty of Data Science Computing Engineering and Technology', 'FCDSET', NULL, '2023-11-12 21:53:22', NULL);
+(1, 'Faculty of Data Science Computing Engineering and Technology', 'FCDSET', NULL, '2023-11-12 21:53:22', NULL),
+(3, 'Faculty of Agriculture and Life Sciences', 'FALS', '', '2023-11-14 19:54:11', NULL);
 
 -- --------------------------------------------------------
 
@@ -148,7 +151,7 @@ CREATE TABLE `students` (
 
 INSERT INTO `students` (`student_id`, `first_name`, `last_name`, `middle_name`, `birthday`, `gender`, `purok`, `barangay`, `municipality`, `province`, `zipcode`, `contact_number`, `institute`, `course`, `guardian_name`, `guardian_contact`, `guardian_address`, `registered_at`, `updated_at`) VALUES
 ('2023-0001', 'Jonathan', 'David', 'Dee', '2000-12-27', 'male', 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FCDSET', 'BSIT', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-14 18:55:48', NULL),
-('2023-0002', 'Jake', 'David', 'Dee', '2000-12-27', 'male', 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FCDSET', 'BSIT', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-14 18:56:03', '2023-11-14 18:57:44');
+('2023-0003', 'Jonathan', 'David', 'Dee', '2000-12-27', 'male', 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FCDSET', 'BSIT', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-15 05:10:40', NULL);
 
 -- --------------------------------------------------------
 
@@ -160,10 +163,18 @@ CREATE TABLE `subjects` (
   `code` varchar(10) NOT NULL,
   `description` text NOT NULL,
   `unit` varchar(2) NOT NULL,
-  `type` enum('lecture','laboratory') NOT NULL,
+  `type` enum('lecture','laboratory','lecture & laboratory') NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subjects`
+--
+
+INSERT INTO `subjects` (`code`, `description`, `unit`, `type`, `created_at`, `updated_at`) VALUES
+('112223', 'Description', '4', '', '2023-11-18 09:05:51', NULL),
+('1234', 'Sample description', '4', 'laboratory', '2023-11-18 07:07:45', NULL);
 
 --
 -- Indexes for dumped tables
@@ -219,25 +230,25 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `course`
 --
 ALTER TABLE `course`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `faculty`
 --
 ALTER TABLE `faculty`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `institute`
 --
 ALTER TABLE `institute`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables

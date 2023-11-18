@@ -122,7 +122,6 @@ class Subject extends Controller
 		$code = isset($_GET["code"]) ? $_GET["code"] : null;
 
 		//set json data from request body
-		$code = $data->code;
 		$description = $data->description;
 		$unit = $data->unit;
 		$type = $data->type;
@@ -153,7 +152,7 @@ class Subject extends Controller
 			exit;
 		}
 
-		if (SubjectModel::delete($code, "co$code")) {
+		if (SubjectModel::delete($code, "code")) {
 			response(200, true, ["message" => "Delete successful"]);
 		} else {
 			response(400, false, ["message" => "Delete Failed!"]);

@@ -149,7 +149,7 @@ class SubjectModel
 		$type
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET code = :code, description = :description, unit = :unit, type = :type";
+			$query = "UPDATE " . self::TABLE . " SET  description = :description, unit = :unit, type = :type WHERE code = :code";
 
 			$stmt = Database::connect()->prepare($query);
 
