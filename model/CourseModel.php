@@ -18,16 +18,18 @@ class CourseModel
 	public static function create(
 		$title,
 		$slug,
-		$description
+		$description,
+		$institute
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET title = :title, slug = :slug, description = :description";
+			$query = "INSERT INTO " . self::TABLE . " SET title = :title, slug = :slug, description = :description, institute = :institute";
 
 			$stmt = Database::connect()->prepare($query);
 
 			$stmt->bindParam(":title", $title);
 			$stmt->bindParam(":slug", $slug);
 			$stmt->bindParam(":description", $description);
+			$stmt->bindParam(":institute", $institute);
 
 			$result = $stmt->execute() ? true : false;
 			return $result;
@@ -144,10 +146,11 @@ class CourseModel
 		$id,
 		$title,
 		$slug,
-		$description
+		$description,
+		$institute
 	) {
 		try {
-			$query = "UPDATE " . self::TABLE . " SET title = :title, slug = :slug, description = :description WHERE id = :id";
+			$query = "UPDATE " . self::TABLE . " SET title = :title, slug = :slug, description = :description, institute = :institute WHERE id = :id";
 
 			$stmt = Database::connect()->prepare($query);
 
@@ -155,6 +158,7 @@ class CourseModel
 			$stmt->bindParam(":title", $title);
 			$stmt->bindParam(":slug", $slug);
 			$stmt->bindParam(":description", $description);
+			$stmt->bindParam(":institute", $institute);
 
 			$result = $stmt->execute() ? true : false;
 			return $result;

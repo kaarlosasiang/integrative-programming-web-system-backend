@@ -52,9 +52,10 @@ class Course extends Controller
 		$title = $data->title;
 		$slug = $data->slug;
 		$description = $data->description;
+		$institute = $data->institute;
 
 
-		$result = CourseModel::create($title, $slug, $description);
+		$result = CourseModel::create($title, $slug, $description, $institute);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -123,14 +124,14 @@ class Course extends Controller
 		$title = $data->title;
 		$slug = $data->slug;
 		$description = $data->description;
-
+		$institute = $data->institute;
 
 		if (!CourseModel::find($id, "id")) {
 			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
-		$result = CourseModel::update($id, $title, $slug, $description);
+		$result = CourseModel::update($id, $title, $slug, $description, $institute);
 
 		if (!$result) {
 			response(400, false, ["message" => "Update failed!"]);

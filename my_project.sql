@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 18, 2023 at 02:11 AM
+-- Generation Time: Nov 19, 2023 at 04:18 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -62,6 +62,7 @@ CREATE TABLE `course` (
   `title` varchar(255) NOT NULL,
   `slug` varchar(10) NOT NULL,
   `description` text DEFAULT NULL,
+  `institute` varchar(10) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -70,9 +71,11 @@ CREATE TABLE `course` (
 -- Dumping data for table `course`
 --
 
-INSERT INTO `course` (`id`, `title`, `slug`, `description`, `created_at`, `updated_at`) VALUES
-(1, 'Bachelor of Science in Information Technology', 'BSIT', NULL, '2023-11-12 21:51:55', NULL),
-(3, 'Bachelor of Science in Civil Engineering', 'BSCE', '', '2023-11-14 20:03:23', NULL);
+INSERT INTO `course` (`id`, `title`, `slug`, `description`, `institute`, `created_at`, `updated_at`) VALUES
+(1, 'Bachelor of Science in Information Technology', 'BSIT', NULL, 'FCDSET', '2023-11-12 21:51:55', '2023-11-19 23:17:54'),
+(3, 'Bachelor of Science in Civil Engineering', 'BSCE', '', 'FCDSET', '2023-11-14 20:03:23', '2023-11-19 23:18:11'),
+(4, 'Bachelor of Physical Education', 'BPED', '', 'FTED', '2023-11-19 22:45:09', '2023-11-19 23:18:02'),
+(5, 'Bachelor of Science in Criminology', 'BSCRIM', '', 'FGBM', '2023-11-19 22:48:05', '2023-11-19 23:18:06');
 
 -- --------------------------------------------------------
 
@@ -93,6 +96,14 @@ CREATE TABLE `faculty` (
   `registered_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `faculty`
+--
+
+INSERT INTO `faculty` (`id`, `first_name`, `last_name`, `middle_name`, `birthday`, `gender`, `institute`, `course`, `contact_number`, `registered_at`, `updated_at`) VALUES
+(4, 'David', 'Ross', 'Mo', '2000-12-27', 'male', 'FTED', 'BPED', '09123456789', '2023-11-19 22:45:14', NULL),
+(6, 'Michelle', 'Dee', 'Mo', '2000-12-27', 'male', 'FGBM', 'BSCRIM', '09123456789', '2023-11-19 22:48:13', NULL);
 
 -- --------------------------------------------------------
 
@@ -115,7 +126,9 @@ CREATE TABLE `institute` (
 
 INSERT INTO `institute` (`id`, `title`, `slug`, `description`, `created_at`, `updated_at`) VALUES
 (1, 'Faculty of Data Science Computing Engineering and Technology', 'FCDSET', NULL, '2023-11-12 21:53:22', NULL),
-(3, 'Faculty of Agriculture and Life Sciences', 'FALS', '', '2023-11-14 19:54:11', NULL);
+(3, 'Faculty of Agriculture and Life Sciences', 'FALS', '', '2023-11-14 19:54:11', NULL),
+(4, 'Faculty of Teachers Education', 'FTED', '', '2023-11-19 22:44:30', NULL),
+(5, 'Faculty of Governance and Business Management', 'FGBM', '', '2023-11-19 22:47:50', NULL);
 
 -- --------------------------------------------------------
 
@@ -151,7 +164,9 @@ CREATE TABLE `students` (
 
 INSERT INTO `students` (`student_id`, `first_name`, `last_name`, `middle_name`, `birthday`, `gender`, `purok`, `barangay`, `municipality`, `province`, `zipcode`, `contact_number`, `institute`, `course`, `guardian_name`, `guardian_contact`, `guardian_address`, `registered_at`, `updated_at`) VALUES
 ('2023-0001', 'Jonathan', 'David', 'Dee', '2000-12-27', 'male', 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FCDSET', 'BSIT', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-14 18:55:48', NULL),
-('2023-0003', 'Jonathan', 'David', 'Dee', '2000-12-27', 'male', 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FCDSET', 'BSIT', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-15 05:10:40', NULL);
+('2023-0003', 'Jonathan', 'David', 'Dee', '2000-12-27', 'male', 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FCDSET', 'BSIT', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-15 05:10:40', NULL),
+('2023-0004', 'Yasmin', 'Mendoza', 'Rosete', '2000-02-21', 'female', 'Mandalihan', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FTED', 'BPED', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-19 22:46:22', NULL),
+('2023-0005', 'Jaquiline', 'Dela Cuadra', 'Rosete', '2000-02-21', 'female', 'San Vicente', 'Corporacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FGBM', 'BSCRIM', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-19 22:49:14', NULL);
 
 -- --------------------------------------------------------
 
@@ -191,7 +206,8 @@ ALTER TABLE `admin`
 --
 ALTER TABLE `course`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `slug` (`slug`);
+  ADD UNIQUE KEY `slug` (`slug`),
+  ADD KEY `institute` (`institute`);
 
 --
 -- Indexes for table `faculty`
@@ -236,23 +252,29 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `course`
 --
 ALTER TABLE `course`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `faculty`
 --
 ALTER TABLE `faculty`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `institute`
 --
 ALTER TABLE `institute`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `course`
+--
+ALTER TABLE `course`
+  ADD CONSTRAINT `course_ibfk_1` FOREIGN KEY (`institute`) REFERENCES `institute` (`slug`);
 
 --
 -- Constraints for table `faculty`
