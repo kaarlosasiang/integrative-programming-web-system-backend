@@ -107,7 +107,8 @@ class Course extends Controller
 				"id" => $result["id"],
 				"title" => $result["title"],
 				"slug" => $result["slug"],
-				"description" => $result["description"]
+				"description" => $result["description"],
+				"institute" => $result["institute"]
 			];
 		}
 		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
