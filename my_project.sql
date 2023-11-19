@@ -87,7 +87,7 @@ CREATE TABLE `faculty` (
   `id` int(11) NOT NULL,
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
-  `middle_name` char(2) NOT NULL,
+  `middle_name` varchar(50) NOT NULL,
   `birthday` date NOT NULL,
   `gender` varchar(20) NOT NULL,
   `institute` varchar(10) NOT NULL,
