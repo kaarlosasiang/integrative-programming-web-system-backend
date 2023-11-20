@@ -42,6 +42,8 @@ class Student extends Controller
 
 		$responseData = [
 			"user_id" => $result["user_id"],
+			"firstname" => $result["first_name"],
+			"lastname" => $result["last_name"],
 			"message" => "Login successful"
 		];
 
