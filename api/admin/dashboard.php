@@ -22,7 +22,7 @@ class Dashboard extends Controller
 	{
 		$this->authResult = AuthMiddleware::authenticate();
 		//verify user role
-		Controller::verifyRole($this->authResult);
+		Controller::verifyRole($this->authResult, Controller::ADMIN_ROLE);
 
 		$requestMethod = $_SERVER["REQUEST_METHOD"];
 

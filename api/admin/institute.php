@@ -4,14 +4,21 @@ namespace api\admin;
 
 use api\Controller;
 use model\InstituteModel;
+use middleware\AuthMiddleware;
 
 require_once(__DIR__ . "/../../model/InstituteModel.php");
+require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
 
 class Institute extends Controller
 {
+	private $authResult;
 	public function __construct()
 	{
+		$this->authResult = AuthMiddleware::authenticate();
+		//verify user role
+		Controller::verifyRole($this->authResult, Controller::ADMIN_ROLE);
+
 		$requestMethod = $_SERVER["REQUEST_METHOD"];
 
 		switch ($requestMethod) {

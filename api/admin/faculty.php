@@ -4,14 +4,21 @@ namespace api\admin;
 
 use api\Controller;
 use model\FacultyModel;
+use middleware\AuthMiddleware;
 
 require_once(__DIR__ . "/../../model/FacultyModel.php");
+require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
 
 class Faculty extends Controller
 {
+	private $authResult;
 	public function __construct()
 	{
+		$this->authResult = AuthMiddleware::authenticate();
+		//verify user role
+		Controller::verifyRole($this->authResult, Controller::ADMIN_ROLE);
+
 		$requestMethod = $_SERVER["REQUEST_METHOD"];
 
 		switch ($requestMethod) {

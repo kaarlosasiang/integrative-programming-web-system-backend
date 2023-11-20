@@ -4,14 +4,20 @@ namespace api\admin;
 
 use api\Controller;
 use model\SubjectModel;
+use middleware\AuthMiddleware;
 
 require_once(__DIR__ . "/../../model/SubjectModel.php");
+require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
 
 class Subject extends Controller
 {
+	private $authResult;
 	public function __construct()
 	{
+		$this->authResult = AuthMiddleware::authenticate();
+		//verify user role
+		Controller::verifyRole($this->authResult, Controller::ADMIN_ROLE);
 		$requestMethod = $_SERVER["REQUEST_METHOD"];
 
 		switch ($requestMethod) {

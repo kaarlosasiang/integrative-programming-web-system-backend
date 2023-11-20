@@ -25,11 +25,19 @@ class Controller
 			exit;
 		}
 	}
-	public function verifyRole($userId)
+	/**	
+	 * @param string $userId - verify the current user
+	 * @param string $requiredRole - verify the required role to access the page
+	 * @param bool $allowAccess - grant access to the required role
+	 */
+	public function verifyRole($userId, $requiredRole, $allowAccess = true)
 	{
 		$role = UserModel::find($userId, "user_id");
 
-		if ($role["role"] !== Controller::ADMIN_ROLE) {
+		if ($role["role"] !== $requiredRole && $allowAccess) {
+			response(403, false, ["message" => "Access denied for user role: {$role['role']}"]);
+			exit;
+		} else if ($role["role"] === $requiredRole && !$allowAccess) {
 			response(403, false, ["message" => "Access denied for user role: {$role['role']}"]);
 			exit;
 		}
