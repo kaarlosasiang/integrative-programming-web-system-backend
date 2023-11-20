@@ -6,10 +6,11 @@ use database\Database;
 use PDOException;
 
 require_once(__DIR__ . "/../database/Database.php");
+require_once(__DIR__ . "/../middleware/JwtHandler.php");
 
 class UserModel
 {
-	private const TABLE = "admin";
+	private const TABLE = "users";
 
 	/**
 	 * Perform insert operation to the database

@@ -2,6 +2,7 @@
 
 namespace api;
 
+use middleware\JwtHandler;
 use model\UserModel;
 
 require_once(__DIR__ . "/../../model/UserModel.php");
@@ -40,10 +41,14 @@ class Student extends Controller
 			exit;
 		}
 
+		$jwtToken = new JwtHandler();
+		$token = $jwtToken->jwtEncodeData("itp130-api", ["user_id" => $result["user_id"]]);
+
 		$responseData = [
+			"message" => "Login successful",
 			"user_id" => $result["user_id"],
 			"role" => $result["role"],
-			"message" => "Login successful"
+			"token" => $token
 		];
 
 		response(200, true, $responseData);

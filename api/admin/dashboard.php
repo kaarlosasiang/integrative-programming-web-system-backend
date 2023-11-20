@@ -3,6 +3,7 @@
 namespace api\admin;
 
 use api\Controller;
+use middleware\AuthMiddleware;
 use model\CourseModel;
 use model\FacultyModel;
 use model\StudentModel;
@@ -10,12 +11,16 @@ use model\StudentModel;
 require_once(__DIR__ . "/../../model/CourseModel.php");
 require_once(__DIR__ . "/../../model/FacultyModel.php");
 require_once(__DIR__ . "/../../model/StudentModel.php");
+require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
 
 class Dashboard extends Controller
 {
+	private $authResult;
 	public function __construct()
 	{
+		$this->authResult = AuthMiddleware::authenticate();
+
 		$requestMethod = $_SERVER["REQUEST_METHOD"];
 
 		switch ($requestMethod) {
