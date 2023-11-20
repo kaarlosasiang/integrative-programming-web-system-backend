@@ -7,6 +7,7 @@ use middleware\AuthMiddleware;
 use model\CourseModel;
 use model\FacultyModel;
 use model\StudentModel;
+use model\UserModel;
 
 require_once(__DIR__ . "/../../model/CourseModel.php");
 require_once(__DIR__ . "/../../model/FacultyModel.php");
@@ -20,6 +21,8 @@ class Dashboard extends Controller
 	public function __construct()
 	{
 		$this->authResult = AuthMiddleware::authenticate();
+		//verify user role
+		Controller::verifyRole($this->authResult);
 
 		$requestMethod = $_SERVER["REQUEST_METHOD"];
 

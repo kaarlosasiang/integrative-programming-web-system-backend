@@ -10,8 +10,6 @@ require_once(__DIR__ . "/../model/UserModel.php");
 
 class AuthMiddleware extends JwtHandler
 {
-	private const TABLE = "users";
-
 	public $id;
 	public $authenticated = false;
 

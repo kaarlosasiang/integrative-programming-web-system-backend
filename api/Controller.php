@@ -2,6 +2,7 @@
 
 namespace api;
 
+use model\UserModel;
 use model\StudentModel;
 
 require_once(__DIR__ . "/../util/header.php");
@@ -9,7 +10,9 @@ require_once(__DIR__ . "/../util/util.php");
 
 class Controller
 {
-
+	public const STUDENT_ROLE = "2";
+	public const FACULTY_ROLE = "1";
+	public const ADMIN_ROLE = "0";
 
 	public static function verifyJsonData($data)
 	{
@@ -19,6 +22,15 @@ class Controller
 		}
 		if (!$data) {
 			response(400, false, ["message" => "Request body is not valid JSON"]);
+			exit;
+		}
+	}
+	public function verifyRole($userId)
+	{
+		$role = UserModel::find($userId, "user_id");
+
+		if ($role["role"] !== Controller::ADMIN_ROLE) {
+			response(403, false, ["message" => "Access denied for user role: {$role['role']}"]);
 			exit;
 		}
 	}
