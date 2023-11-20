@@ -1,11 +1,12 @@
 <?php
 
-namespace api;
+namespace api\admin;
 
+use api\Controller;
 use model\StudentModel;
 
-require_once(__DIR__ . "/../model/StudentModel.php");
-require_once(__DIR__ . "/Controller.php");
+require_once(__DIR__ . "/../../model/StudentModel.php");
+require_once(__DIR__ . "/../Controller.php");
 
 class Student extends Controller
 {

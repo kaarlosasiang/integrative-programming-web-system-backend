@@ -1,13 +1,14 @@
 <?php
 
-namespace api;
+namespace api\admin;
 
-use model\SubjectModel;
+use api\Controller;
+use model\CourseModel;
 
-require_once(__DIR__ . "/../model/SubjectModel.php");
-require_once(__DIR__ . "/Controller.php");
+require_once(__DIR__ . "/../../model/CourseModel.php");
+require_once(__DIR__ . "/../Controller.php");
 
-class Subject extends Controller
+class Course extends Controller
 {
 	public function __construct()
 	{
@@ -49,14 +50,13 @@ class Subject extends Controller
 		Controller::verifyJsonData($data);
 
 		//set json data from request body
-		$code = $data->code;
+		$title = $data->title;
+		$slug = $data->slug;
 		$description = $data->description;
-		$unit = $data->unit;
-		$type = $data->type;
+		$institute = $data->institute;
 
 
-
-		$result = SubjectModel::create($code, $description, $unit, $type);
+		$result = CourseModel::create($title, $slug, $description, $institute);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -67,12 +67,12 @@ class Subject extends Controller
 	}
 	public function show()
 	{
-		$code = isset($_GET["code"]) ? $_GET["code"] : null;
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
-		$results = SubjectModel::find($code, "code");
+		$results = CourseModel::find($id, "id");
 
 		if (!$results) {
-			response(404, false, ["message" => "Subject not found!"]);
+			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
@@ -82,10 +82,10 @@ class Subject extends Controller
 	{
 		$query = isset($_GET["query"]) ? $_GET["query"] : null;
 
-		$results = SubjectModel::search($query);
+		$results = CourseModel::search($query);
 
 		if (!$results) {
-			response(404, false, ["message" => "Subject not found!"]);
+			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
@@ -93,10 +93,10 @@ class Subject extends Controller
 	}
 	public function all()
 	{
-		$results = SubjectModel::all();
+		$results = CourseModel::all();
 
 		if (!$results) {
-			response(200, false, ["message" => "No registered subjects currently"]);
+			response(200, false, ["message" => "No registered course currently"]);
 			exit;
 		}
 
@@ -105,10 +105,11 @@ class Subject extends Controller
 		foreach ($results as $result) {
 
 			$returnData[] = [
-				"code" => $result["code"],
+				"id" => $result["id"],
+				"title" => $result["title"],
+				"slug" => $result["slug"],
 				"description" => $result["description"],
-				"unit" => $result["unit"],
-				"type" => $result["type"]
+				"institute" => $result["institute"]
 			];
 		}
 		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
@@ -119,20 +120,20 @@ class Subject extends Controller
 
 		Controller::verifyJsonData($data);
 
-		$code = isset($_GET["code"]) ? $_GET["code"] : null;
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		//set json data from request body
+		$title = $data->title;
+		$slug = $data->slug;
 		$description = $data->description;
-		$unit = $data->unit;
-		$type = $data->type;
+		$institute = $data->institute;
 
-
-		if (!SubjectModel::find($code, "code")) {
-			response(404, false, ["message" => "Subject not found!"]);
+		if (!CourseModel::find($id, "id")) {
+			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
-		$result = SubjectModel::update($code, $description, $unit, $type);
+		$result = CourseModel::update($id, $title, $slug, $description, $institute);
 
 		if (!$result) {
 			response(400, false, ["message" => "Update failed!"]);
@@ -143,20 +144,20 @@ class Subject extends Controller
 	}
 	public function delete()
 	{
-		$code = isset($_GET["code"]) ? $_GET["code"] : null;
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
-		$results = SubjectModel::find($code, "code");
+		$results = CourseModel::find($id, "id");
 
 		if (!$results) {
-			response(404, false, ["message" => "Subject not found!"]);
+			response(404, false, ["message" => "Course not found!"]);
 			exit;
 		}
 
-		if (SubjectModel::delete($code, "code")) {
+		if (CourseModel::delete($id, "id")) {
 			response(200, true, ["message" => "Delete successful"]);
 		} else {
 			response(400, false, ["message" => "Delete Failed!"]);
 		}
 	}
 }
-new Subject();
+new Course();
