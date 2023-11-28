@@ -18,20 +18,29 @@ class UserModel
 	 */
 	public static function create(
 		$firstname,
+		$middlename,
 		$lastname,
+		$birthday,
+		$gender,
+		$contactnumber,
 		$email,
-		$password
+		$password,
+		$role
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET first_name = :firstname, last_name = :lastname, email = :email, password = :password";
+			$query = "INSERT INTO " . self::TABLE . " SET first_name = :firstname, middle_name = :middlename, last_name = :lastname, birthday = :birthday, gender = :gender, email = :email, contact_number = :contactnumber, password = :password, role = :role";
 
 			$stmt = Database::connect()->prepare($query);
 
 			$stmt->bindParam(":firstname", $firstname);
+			$stmt->bindParam(":middlename", $middlename);
 			$stmt->bindParam(":lastname", $lastname);
+			$stmt->bindParam(":birthday", $birthday);
+			$stmt->bindParam(":gender", $gender);
 			$stmt->bindParam(":email", $email);
+			$stmt->bindParam(":contactnumber", $contactnumber);
 			$stmt->bindParam(":password", $password);
-
+			$stmt->bindParam(":role", $role);
 
 			$result = $stmt->execute() ? true : false;
 			return $result;

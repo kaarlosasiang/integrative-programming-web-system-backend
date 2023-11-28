@@ -5,8 +5,12 @@ namespace api\admin;
 use api\Controller;
 use model\StudentModel;
 use middleware\AuthMiddleware;
+use model\CourseModel;
+use model\InstituteModel;
 use model\UserModel;
 
+require_once(__DIR__ . "/../../model/CourseModel.php");
+require_once(__DIR__ . "/../../model/InstituteModel.php");
 require_once(__DIR__ . "/../../model/StudentModel.php");
 require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
@@ -75,10 +79,16 @@ class Student extends Controller
 		$guardian_contact = $data->guardian_contact;
 		$guardian_address = $data->guardian_address;
 
+		$fetchEmail = UserModel::find($email, "email");
 
-		$result = StudentModel::all();
+		if ($fetchEmail) {
+			response(409, false, ["message" => "Email already taken"]);
+			exit;
+		}
 
-		if (!$result) {
+		$fetchAll = StudentModel::all();
+
+		if (!$fetchAll) {
 			//initial value
 			$recordCount = 0;
 		} else {
@@ -88,12 +98,28 @@ class Student extends Controller
 
 		$student_id = Controller::generateIdNum($recordCount);
 
-		//register a user acc
-		$user = UserModel::create($firstname, $lastname, $email, $student_id);
+		$insertUser = UserModel::create($firstname, $middlename, $lastname, $birthday, $gender, $contact, $email, $student_id, Controller::STUDENT_ROLE); //default student password is id
 
-		$result = StudentModel::create($student_id, $firstname, $lastname, $middlename, $birthday, $gender, $street, $barangay, $municipality, $province, $zipcode, $contact, $institute, $course, $guardian_name, $guardian_contact, $guardian_address);
+		if (!$insertUser) {
+			response(500, false, ["There is an error in user insertion"]);
+			exit;
+		}
 
-		if (!$result) {
+		$fetchUserId = UserModel::find($email, "email")["user_id"];
+
+		if (!CourseModel::find($course, "slug")) {
+			response(400, false, ["message" => "Course does not exists"]);
+			exit;
+		}
+
+		if (!InstituteModel::find($institute, "slug")) {
+			response(400, false, ["message" => "Insitute does not exists"]);
+			exit;
+		}
+
+		$registerStudent = StudentModel::create($fetchUserId, $student_id, $street, $barangay, $municipality, $province, $zipcode, $institute, $course, $guardian_name, $guardian_contact, $guardian_address);
+
+		if (!$registerStudent) {
 			response(400, false, ["message" => "Registration failed!"]);
 			exit;
 		} else {

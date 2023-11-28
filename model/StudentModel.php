@@ -22,6 +22,7 @@ class StudentModel
 		$barangay,
 		$municipality,
 		$province,
+		$zipCode,
 		$institute,
 		$course,
 		$guardianName,
@@ -30,7 +31,7 @@ class StudentModel
 
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET user_id = :userid student_id = :studentId, purok = :purok, barangay = :barangay, municipality = :municipality, province = :province, zipcode = :zipCode, institute = :institute, course = :course, guardian_name = :guardianName, guardian_contact = :guardianContact, guardian_address = :guardianAddress";
+			$query = "INSERT INTO " . self::TABLE . " SET user_id = :userid, student_id = :studentId, purok = :purok, barangay = :barangay, municipality = :municipality, province = :province, zipcode = :zipCode, institute = :institute, course = :course, guardian_name = :guardianName, guardian_contact = :guardianContact, guardian_address = :guardianAddress";
 
 			$stmt = Database::connect()->prepare($query);
 
