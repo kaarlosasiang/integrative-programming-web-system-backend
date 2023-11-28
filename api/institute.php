@@ -3,6 +3,7 @@
 namespace api;
 
 use model\InstituteModel;
+use model\StudentModel;
 
 require_once(__DIR__ . "/../model/InstituteModel.php");
 require_once(__DIR__ . "/Controller.php");
@@ -143,6 +144,14 @@ class Institute extends Controller
 		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		$results = InstituteModel::find($id, "id");
+
+		//verify if student is enrolled in the institute
+		$studentByMajor = StudentModel::find($results["institute"], "institute");
+
+		if ($studentByMajor) {
+			response(400, false, ["message" => "Students are enrolled in this institute"]);
+			exit;
+		}
 
 		if (!$results) {
 			response(404, false, ["message" => "Institute not found!"]);
