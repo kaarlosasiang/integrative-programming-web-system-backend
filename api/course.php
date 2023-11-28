@@ -154,11 +154,11 @@ class Course extends Controller
 			exit;
 		}
 
-		//verify if student is enrolled in the institute
-		$studentByMajor = StudentModel::find($results["slug"], "institute");
+		//verify if student is enrolled in the coursea
+		$studentByMajor = StudentModel::find($results["slug"], "course");
 
 		if ($studentByMajor) {
-			response(400, false, ["message" => "Students are enrolled in this institute"]);
+			response(400, false, ["message" => "Students are enrolled in this course"]);
 			exit;
 		}
 
