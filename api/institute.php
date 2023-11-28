@@ -6,6 +6,7 @@ use model\InstituteModel;
 use model\StudentModel;
 
 require_once(__DIR__ . "/../model/InstituteModel.php");
+require_once(__DIR__ . "/../model/StudentModel.php");
 require_once(__DIR__ . "/Controller.php");
 
 class Institute extends Controller
