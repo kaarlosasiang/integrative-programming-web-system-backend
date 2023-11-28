@@ -5,6 +5,7 @@ namespace api\admin;
 use api\Controller;
 use model\StudentModel;
 use middleware\AuthMiddleware;
+use model\UserModel;
 
 require_once(__DIR__ . "/../../model/StudentModel.php");
 require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
@@ -66,13 +67,13 @@ class Student extends Controller
 		$municipality = $data->municipality;
 		$province = $data->province;
 		$zipcode = $data->zipcode;
+		$email = $data->email;
 		$contact = $data->contact;
 		$course = $data->course;
 		$institute = $data->institute;
 		$guardian_name = $data->guardian_name;
 		$guardian_contact = $data->guardian_contact;
 		$guardian_address = $data->guardian_address;
-
 
 
 		$result = StudentModel::all();
@@ -85,8 +86,10 @@ class Student extends Controller
 			$recordCount = count(StudentModel::all());
 		}
 
-		// dd($recordCount);
 		$student_id = Controller::generateIdNum($recordCount);
+
+		//register a user acc
+		$user = UserModel::create($firstname, $lastname, $email, $student_id);
 
 		$result = StudentModel::create($student_id, $firstname, $lastname, $middlename, $birthday, $gender, $street, $barangay, $municipality, $province, $zipcode, $contact, $institute, $course, $guardian_name, $guardian_contact, $guardian_address);
 

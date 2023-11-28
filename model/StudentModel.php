@@ -16,18 +16,12 @@ class StudentModel
 	 * @return true if success
 	 */
 	public static function create(
+		$userid,
 		$studentId,
-		$firstname,
-		$lastname,
-		$middlename,
-		$birthday,
-		$gender,
 		$purok,
 		$barangay,
 		$municipality,
 		$province,
-		$zipCode,
-		$contactNumber,
 		$institute,
 		$course,
 		$guardianName,
@@ -36,22 +30,17 @@ class StudentModel
 
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET student_id = :studentId, first_name = :firstname, last_name = :lastname, middle_name = :middlename, birthday = :birthday, gender = :gender, purok = :purok, barangay = :barangay, municipality = :municipality, province = :province, zipcode = :zipCode, contact_number = :contactNumber, institute = :institute, course = :course, guardian_name = :guardianName, guardian_contact = :guardianContact, guardian_address = :guardianAddress";
+			$query = "INSERT INTO " . self::TABLE . " SET user_id = :userid student_id = :studentId, purok = :purok, barangay = :barangay, municipality = :municipality, province = :province, zipcode = :zipCode, institute = :institute, course = :course, guardian_name = :guardianName, guardian_contact = :guardianContact, guardian_address = :guardianAddress";
 
 			$stmt = Database::connect()->prepare($query);
 
+			$stmt->bindParam(":userid", $userid);
 			$stmt->bindParam(":studentId", $studentId);
-			$stmt->bindParam(":firstname", $firstname);
-			$stmt->bindParam(":lastname", $lastname);
-			$stmt->bindParam(":middlename", $middlename);
-			$stmt->bindParam(":birthday", $birthday);
-			$stmt->bindParam(":gender", $gender);
 			$stmt->bindParam(":purok", $purok);
 			$stmt->bindParam(":barangay", $barangay);
 			$stmt->bindParam(":municipality", $municipality);
 			$stmt->bindParam(":province", $province);
 			$stmt->bindParam(":zipCode", $zipCode);
-			$stmt->bindParam(":contactNumber", $contactNumber);
 			$stmt->bindParam(":institute", $institute);
 			$stmt->bindParam(":course", $course);
 			$stmt->bindParam(":guardianName", $guardianName);

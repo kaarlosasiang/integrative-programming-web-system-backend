@@ -2,11 +2,13 @@
 
 namespace api;
 
+use model\SchoolYearModel;
 use model\UserModel;
 use model\StudentModel;
 
 require_once(__DIR__ . "/../util/header.php");
 require_once(__DIR__ . "/../util/util.php");
+require_once(__DIR__ . "/../model/SchoolYearModel.php");
 
 class Controller
 {
@@ -45,7 +47,7 @@ class Controller
 	public static function generateIdNum($recordCount)
 	{
 		// Get the current year
-		$currentYear = date("Y");
+		$currentYear = SchoolYearModel::find("1", "status")["year"];
 
 		if ($recordCount > 0) {
 			$recordCount = ++$recordCount; // Increment by 1 for the next record
