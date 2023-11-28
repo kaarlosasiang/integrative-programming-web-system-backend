@@ -146,19 +146,17 @@ class Institute extends Controller
 
 		$results = InstituteModel::find($id, "id");
 
+		if (!$results) {
+			response(404, false, ["message" => "Institute not found!"]);
+			exit;
+		}
 		//verify if student is enrolled in the institute
-		$studentByMajor = StudentModel::find($results["institute"], "institute");
+		$studentByMajor = StudentModel::find($results["slug"], "institute");
 
 		if ($studentByMajor) {
 			response(400, false, ["message" => "Students are enrolled in this institute"]);
 			exit;
 		}
-
-		if (!$results) {
-			response(404, false, ["message" => "Institute not found!"]);
-			exit;
-		}
-
 		if (InstituteModel::delete($id, "id")) {
 			response(200, true, ["message" => "Delete successful"]);
 		} else {

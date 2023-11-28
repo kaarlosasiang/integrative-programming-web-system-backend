@@ -3,7 +3,9 @@
 namespace api;
 
 use model\CourseModel;
+use model\StudentModel;
 
+require_once(__DIR__ . "/../model/StudentModel.php");
 require_once(__DIR__ . "/../model/CourseModel.php");
 require_once(__DIR__ . "/Controller.php");
 
@@ -149,6 +151,14 @@ class Course extends Controller
 
 		if (!$results) {
 			response(404, false, ["message" => "Course not found!"]);
+			exit;
+		}
+
+		//verify if student is enrolled in the institute
+		$studentByMajor = StudentModel::find($results["slug"], "institute");
+
+		if ($studentByMajor) {
+			response(400, false, ["message" => "Students are enrolled in this institute"]);
 			exit;
 		}
 
