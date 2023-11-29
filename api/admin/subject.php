@@ -5,8 +5,11 @@ namespace api\admin;
 use api\Controller;
 use model\SubjectModel;
 use middleware\AuthMiddleware;
+use model\FacultyModel;
+use model\SchoolYearModel;
 
 require_once(__DIR__ . "/../../model/SubjectModel.php");
+require_once(__DIR__ . "/../../model/FacultyModel.php");
 require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
 
@@ -84,7 +87,25 @@ class Subject extends Controller
 			exit;
 		}
 
-		response(200, true, $results);
+		$schoolyear = SchoolYearModel::find($results["school_year"], "id")["school_year"];
+
+		//fetch faculty assigned
+		$faculty = FacultyModel::find($results["faculty"], "faculty_id");
+		$facultyName = $faculty["first_name"] . " " . $faculty["middle_name"] . " " . $faculty["last_name"];
+
+
+		$returnData = [
+			"code" => $results["code"],
+			"description" => $results["description"],
+			"unit" => $results["unit"],
+			"type" => $results["type"],
+			"status" => $results["status"],
+			"school_year" => $schoolyear,
+			"faculty" => $facultyName,
+			"created_at" => $results["created_at"],
+			"updated_at" => $results["updated_at"]
+		];
+		response(200, true, $returnData);
 	}
 	public function search()
 	{
@@ -97,7 +118,27 @@ class Subject extends Controller
 			exit;
 		}
 
-		response(200, true, ["data" => $results]);
+		foreach ($results as $result) {
+			$schoolyear = SchoolYearModel::find($result["school_year"], "id")["school_year"];
+
+			//fetch faculty assigned
+			$faculty = FacultyModel::find($result["faculty"], "faculty_id");
+			$facultyName = $faculty["first_name"] . " " . $faculty["middle_name"] . " " . $faculty["last_name"];
+
+			$returnData[] = [
+				"code" => $result["code"],
+				"description" => $result["description"],
+				"unit" => $result["unit"],
+				"type" => $result["type"],
+				"status" => $result["status"],
+				"school_year" => $schoolyear,
+				"faculty" => $facultyName,
+				"created_at" => $result["created_at"],
+				"updated_at" => $result["updated_at"]
+			];
+		}
+
+		response(200, true, ["data" => $returnData]);
 	}
 	public function all()
 	{
@@ -108,9 +149,27 @@ class Subject extends Controller
 			exit;
 		}
 
+		foreach ($results as $result) {
+			$schoolyear = SchoolYearModel::find($result["school_year"], "id")["school_year"];
+
+			//fetch faculty assigned
+			$faculty = FacultyModel::find($result["faculty"], "faculty_id");
+			$facultyName = $faculty["first_name"] . " " . $faculty["middle_name"] . " " . $faculty["last_name"];
+
+			$returnData[] = [
+				"code" => $result["code"],
+				"description" => $result["description"],
+				"unit" => $result["unit"],
+				"type" => $result["type"],
+				"status" => $result["status"],
+				"school_year" => $schoolyear,
+				"faculty" => $facultyName
+			];
+		}
+
 		$numRows = count($results);
 
-		response(200, true, ["row_count" => $numRows, "data" => $results]);
+		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
 	}
 	public function update()
 	{
