@@ -85,4 +85,68 @@ class UserModel
 			exit;
 		}
 	}
+	/**
+	 * Perform insert operation to the database
+	 * @return true if success
+	 */
+	public static function update(
+		$userId,
+		$firstname,
+		$middlename,
+		$lastname,
+		$birthday,
+		$gender,
+		$contactnumber,
+		$email
+	) {
+		try {
+			$query = "UPDATE " . self::TABLE . " SET first_name = :firstname, middle_name = :middlename, last_name = :lastname, birthday = :birthday, gender = :gender, email = :email, contact_number = :contactnumber WHERE user_id = :userId";
+
+			$stmt = Database::connect()->prepare($query);
+
+			$stmt->bindParam(":userId", $userId);
+			$stmt->bindParam(":firstname", $firstname);
+			$stmt->bindParam(":middlename", $middlename);
+			$stmt->bindParam(":lastname", $lastname);
+			$stmt->bindParam(":birthday", $birthday);
+			$stmt->bindParam(":gender", $gender);
+			$stmt->bindParam(":email", $email);
+			$stmt->bindParam(":contactnumber", $contactnumber);
+
+			$result = $stmt->execute() ? true : false;
+			return $result;
+		} catch (PDOException $e) {
+			$response = [
+				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+			];
+			response(500, false, $response);
+			exit;
+		}
+	}
+	/**
+	 * Delete data on the database
+	 * @return bool true if successful
+	 */
+	public static function delete($column, $condition)
+	{
+		try {
+			//query statement
+			$query = "DELETE FROM " . self::TABLE . " WHERE $condition = :$condition";
+			//prepared statement
+			$stmt = Database::connect()->prepare($query);
+
+			$stmt->bindParam(":$condition", $column);
+
+
+			$result = $stmt->execute() ? true : false;
+
+			return $result;
+		} catch (PDOException $e) {
+			$response = [
+				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+			];
+			response(500, false, $response);
+			exit;
+		}
+	}
 }

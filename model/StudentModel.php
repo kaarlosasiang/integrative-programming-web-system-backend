@@ -16,13 +16,21 @@ class StudentModel
 	 * @return true if success
 	 */
 	public static function create(
-		$userid,
 		$studentId,
-		$purok,
+		$firstname,
+		$middlename,
+		$lastname,
+		$birthday,
+		$gender,
+		$contactNumber,
+		$email,
+		$password,
+		$role,
+		$street,
 		$barangay,
 		$municipality,
 		$province,
-		$zipCode,
+		$zipcode,
 		$institute,
 		$course,
 		$guardianName,
@@ -31,17 +39,25 @@ class StudentModel
 
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET user_id = :userid, student_id = :studentId, purok = :purok, barangay = :barangay, municipality = :municipality, province = :province, zipcode = :zipCode, institute = :institute, course = :course, guardian_name = :guardianName, guardian_contact = :guardianContact, guardian_address = :guardianAddress";
+			$query = "CALL InsertStudent(:studentId, :role, :firstname, :middlename, :lastname, :birthday, :gender, :email, :contactNumber, :password, :street, :barangay, :municipality, :province, :zipcode, :institute, :course, :guardianName, :guardianContact, :guardianAddress)";
 
 			$stmt = Database::connect()->prepare($query);
 
-			$stmt->bindParam(":userid", $userid);
 			$stmt->bindParam(":studentId", $studentId);
-			$stmt->bindParam(":purok", $purok);
+			$stmt->bindParam(":role", $role);
+			$stmt->bindParam(":firstname", $firstname);
+			$stmt->bindParam(":middlename", $middlename);
+			$stmt->bindParam(":lastname", $lastname);
+			$stmt->bindParam(":birthday", $birthday);
+			$stmt->bindParam(":gender", $gender);
+			$stmt->bindParam(":email", $email);
+			$stmt->bindParam(":contactNumber", $contactNumber);
+			$stmt->bindParam(":password", $password);
+			$stmt->bindParam(":street", $street);
 			$stmt->bindParam(":barangay", $barangay);
 			$stmt->bindParam(":municipality", $municipality);
 			$stmt->bindParam(":province", $province);
-			$stmt->bindParam(":zipCode", $zipCode);
+			$stmt->bindParam(":zipcode", $zipcode);
 			$stmt->bindParam(":institute", $institute);
 			$stmt->bindParam(":course", $course);
 			$stmt->bindParam(":guardianName", $guardianName);
@@ -162,17 +178,11 @@ class StudentModel
 	 */
 	public static function update(
 		$studentId,
-		$firstname,
-		$lastname,
-		$middlename,
-		$birthday,
-		$gender,
-		$purok,
+		$street,
 		$barangay,
 		$municipality,
 		$province,
 		$zipCode,
-		$contactNumber,
 		$institute,
 		$course,
 		$guardianName,
@@ -180,22 +190,16 @@ class StudentModel
 		$guardianAddress
 	) {
 		try {
-			$query = "UPDATE " . self::TABLE . " SET first_name = :firstname, last_name = :lastname, middle_name = :middlename, birthday = :birthday, gender = :gender, purok = :purok, barangay = :barangay, municipality = :municipality, province = :province, zipcode = :zipCode, contact_number = :contactNumber, institute = :institute, course = :course, guardian_name = :guardianName, guardian_contact = :guardianContact, guardian_address = :guardianAddress  WHERE student_id = :studentId";
+			$query = "UPDATE " . self::TABLE . " SET street = :street, barangay = :barangay, municipality = :municipality, province = :province, zipcode = :zipCode, institute = :institute, course = :course, guardian_name = :guardianName, guardian_contact = :guardianContact, guardian_address = :guardianAddress  WHERE student_id = :studentId";
 
 			$stmt = Database::connect()->prepare($query);
 
 			$stmt->bindParam(":studentId", $studentId);
-			$stmt->bindParam(":firstname", $firstname);
-			$stmt->bindParam(":lastname", $lastname);
-			$stmt->bindParam(":middlename", $middlename);
-			$stmt->bindParam(":birthday", $birthday);
-			$stmt->bindParam(":gender", $gender);
-			$stmt->bindParam(":purok", $purok);
+			$stmt->bindParam(":street", $street);
 			$stmt->bindParam(":barangay", $barangay);
 			$stmt->bindParam(":municipality", $municipality);
 			$stmt->bindParam(":province", $province);
 			$stmt->bindParam(":zipCode", $zipCode);
-			$stmt->bindParam(":contactNumber", $contactNumber);
 			$stmt->bindParam(":institute", $institute);
 			$stmt->bindParam(":course", $course);
 			$stmt->bindParam(":guardianName", $guardianName);
