@@ -81,7 +81,7 @@ class StudentModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE . " WHERE $condition = :$condition";
+			$query = "SELECT * FROM " . self::TABLE . " JOIN users on students.user_id = users.user_id WHERE $condition = :$condition";
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
@@ -116,7 +116,7 @@ class StudentModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE . " WHERE first_name LIKE :firstName OR middle_name LIKE :middleName OR last_name LIKE :lastName";
+			$query = "SELECT * FROM " . self::TABLE . " JOIN users on students.user_id = users.user_id WHERE users.first_name LIKE :firstName OR users.middle_name LIKE :middleName OR users.last_name LIKE :lastName";
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
@@ -151,7 +151,7 @@ class StudentModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE;
+			$query = "SELECT s.student_id, u.first_name, u.middle_name, u.last_name, s.course, s.institute FROM " . self::TABLE . " s JOIN users u ON u.user_id = s.user_id";
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
 
@@ -177,12 +177,20 @@ class StudentModel
 	 * @return bool true if successul
 	 */
 	public static function update(
+		$userId,
 		$studentId,
+		$firstname,
+		$middlename,
+		$lastname,
+		$birthday,
+		$gender,
+		$contactNumber,
+		$email,
 		$street,
 		$barangay,
 		$municipality,
 		$province,
-		$zipCode,
+		$zipcode,
 		$institute,
 		$course,
 		$guardianName,
@@ -190,16 +198,24 @@ class StudentModel
 		$guardianAddress
 	) {
 		try {
-			$query = "UPDATE " . self::TABLE . " SET street = :street, barangay = :barangay, municipality = :municipality, province = :province, zipcode = :zipCode, institute = :institute, course = :course, guardian_name = :guardianName, guardian_contact = :guardianContact, guardian_address = :guardianAddress  WHERE student_id = :studentId";
+			$query = "CALL UpdateStudent(:userId, :studentId, :firstname, :middlename, :lastname, :birthday, :gender, :email, :contactNumber, :street, :barangay, :municipality, :province, :zipcode, :institute, :course, :guardianName, :guardianContact, :guardianAddress)";
 
 			$stmt = Database::connect()->prepare($query);
 
+			$stmt->bindParam(":userId", $userId);
 			$stmt->bindParam(":studentId", $studentId);
+			$stmt->bindParam(":firstname", $firstname);
+			$stmt->bindParam(":middlename", $middlename);
+			$stmt->bindParam(":lastname", $lastname);
+			$stmt->bindParam(":birthday", $birthday);
+			$stmt->bindParam(":gender", $gender);
+			$stmt->bindParam(":email", $email);
+			$stmt->bindParam(":contactNumber", $contactNumber);
 			$stmt->bindParam(":street", $street);
 			$stmt->bindParam(":barangay", $barangay);
 			$stmt->bindParam(":municipality", $municipality);
 			$stmt->bindParam(":province", $province);
-			$stmt->bindParam(":zipCode", $zipCode);
+			$stmt->bindParam(":zipcode", $zipcode);
 			$stmt->bindParam(":institute", $institute);
 			$stmt->bindParam(":course", $course);
 			$stmt->bindParam(":guardianName", $guardianName);

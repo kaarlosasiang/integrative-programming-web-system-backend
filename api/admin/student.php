@@ -125,7 +125,7 @@ class Student extends Controller
 	{
 		$studentId = isset($_GET["id"]) ? $_GET["id"] : null;
 
-		$results = StudentModel::find($studentId, "user_id");
+		$results = StudentModel::find($studentId, "student_id");
 
 		if (!$results) {
 			response(404, false, ["message" => "Student not found!"]);
@@ -193,13 +193,6 @@ class Student extends Controller
 			exit;
 		}
 
-		$insertUser = UserModel::update($student["user_id"], $firstname, $middlename, $lastname, $birthday, $gender, $contact, $email);
-
-		if (!$insertUser) {
-			response(500, false, ["message" => "Error in updating a user"]);
-			exit;
-		}
-
 		if (!CourseModel::find($course, "slug")) {
 			response(400, false, ["message" => "Course does not exists"]);
 			exit;
@@ -210,13 +203,13 @@ class Student extends Controller
 			exit;
 		}
 
-		$registerStudent = StudentModel::update($student_id, $street, $barangay, $municipality, $province, $zipcode, $institute, $course, $guardian_name, $guardian_contact, $guardian_address);
+		$registerStudent = StudentModel::update($student['user_id'], $student_id, $firstname, $middlename, $lastname, $birthday, $gender, $contact, $email, $street, $barangay, $municipality, $province, $zipcode, $institute, $course, $guardian_name, $guardian_contact, $guardian_address);
 
 		if (!$registerStudent) {
-			response(400, false, ["message" => "Registration failed!"]);
+			response(400, false, ["message" => "Update failed!"]);
 			exit;
 		} else {
-			response(201, true, ["message" => "Registered successfully!"]);
+			response(201, true, ["message" => "Updated successfully!"]);
 		}
 	}
 	public function delete()
