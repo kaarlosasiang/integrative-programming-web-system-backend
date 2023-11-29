@@ -120,7 +120,6 @@ class Subject extends Controller
 		$code = isset($_GET["code"]) ? $_GET["code"] : null;
 
 		//set json data from request body
-		$code = $data->code;
 		$description = $data->description;
 		$unit = $data->unit;
 		$type = $data->type;
