@@ -44,7 +44,7 @@ class InstituteModel
 	 * @return null if condition is not found
 	 * @return array result
 	 */
-	public static function find($column, $condition)
+	public static function find($column, $condition, $fetchAll = false)
 	{
 		try {
 			//query statement
@@ -61,8 +61,11 @@ class InstituteModel
 				exit;
 			}
 			//fetch and return result
-			$result = $stmt->fetch();
-			return $result;
+			if ($fetchAll === true) {
+				$result = $stmt->fetchAll();
+			} else {
+				$result = $stmt->fetch();
+			}
 		} catch (PDOException $e) {
 			$response = [
 				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
