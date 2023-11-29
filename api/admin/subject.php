@@ -62,8 +62,9 @@ class Subject extends Controller
 		$type = $data->type;
 		$schoolyear = $data->schoolYear;
 		$status = $data->status;
+		$faculty = $data->faculty;
 
-		$result = SubjectModel::create($code, $description, $unit, $type, $schoolyear, $status);
+		$result = SubjectModel::create($code, $description, $unit, $type, $schoolyear, $status, $faculty);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -125,14 +126,14 @@ class Subject extends Controller
 		$type = $data->type;
 		$schoolyear = $data->schoolYear;
 		$status = $data->status;
-
+		$faculty = $data->faculty;
 
 		if (!SubjectModel::find($code, "code")) {
 			response(404, false, ["message" => "Subject not found!"]);
 			exit;
 		}
 
-		$result = SubjectModel::update($code, $description, $unit, $type, $schoolyear, $status);
+		$result = SubjectModel::update($code, $description, $unit, $type, $schoolyear, $status, $faculty);
 
 		if (!$result) {
 			response(400, false, ["message" => "Update failed!"]);

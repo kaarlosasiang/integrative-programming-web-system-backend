@@ -21,10 +21,11 @@ class SubjectModel
 		$unit,
 		$type,
 		$schoolYear,
-		$status
+		$status,
+		$faculty
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET code = :code, description = :description, unit = :unit, type = :type, status = :status, school_year = :schoolYear";
+			$query = "INSERT INTO " . self::TABLE . " SET code = :code, description = :description, unit = :unit, type = :type, status = :status, school_year = :schoolYear, faculty = :faculty";
 
 			$stmt = Database::connect()->prepare($query);
 
@@ -34,6 +35,7 @@ class SubjectModel
 			$stmt->bindParam(":type", $type);
 			$stmt->bindParam(":schoolYear", $schoolYear);
 			$stmt->bindParam(":status", $status);
+			$stmt->bindParam(":faculty", $faculty);
 
 			$result = $stmt->execute() ? true : false;
 			return $result;
@@ -152,10 +154,11 @@ class SubjectModel
 		$unit,
 		$type,
 		$schoolYear,
-		$status
+		$status,
+		$faculty
 	) {
 		try {
-			$query = "UPDATE " . self::TABLE . " SET  description = :description, unit = :unit, type = :type, status = :status, school_year = :schoolYear  WHERE code = :code";
+			$query = "UPDATE " . self::TABLE . " SET  description = :description, unit = :unit, type = :type, status = :status, school_year = :schoolYear, faculty = :faculty  WHERE code = :code";
 
 			$stmt = Database::connect()->prepare($query);
 
@@ -165,6 +168,7 @@ class SubjectModel
 			$stmt->bindParam(":type", $type);
 			$stmt->bindParam(":status", $status);
 			$stmt->bindParam(":schoolYear", $schoolYear);
+			$stmt->bindParam(":faculty", $faculty);
 
 			$result = $stmt->execute() ? true : false;
 			return $result;
