@@ -26,7 +26,7 @@ class Subject extends Controller
 					break;
 				}
 			case "GET": {
-					if (array_key_exists("id", $_GET) || !empty($_GET["id"])) {
+					if (array_key_exists("code", $_GET) || !empty($_GET["code"])) {
 						$this->show();
 					} else if (array_key_exists("query", $_GET) || !empty($_GET["query"])) {
 						$this->search();
@@ -60,10 +60,10 @@ class Subject extends Controller
 		$description = $data->description;
 		$unit = $data->unit;
 		$type = $data->type;
+		$schoolyear = $data->schoolYear;
+		$status = $data->status;
 
-
-
-		$result = SubjectModel::create($code, $description, $unit, $type);
+		$result = SubjectModel::create($code, $description, $unit, $type, $schoolyear, $status);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -109,16 +109,7 @@ class Subject extends Controller
 
 		$numRows = count($results);
 
-		foreach ($results as $result) {
-
-			$returnData[] = [
-				"code" => $result["code"],
-				"description" => $result["description"],
-				"unit" => $result["unit"],
-				"type" => $result["type"]
-			];
-		}
-		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
+		response(200, true, ["row_count" => $numRows, "data" => $results]);
 	}
 	public function update()
 	{
@@ -129,9 +120,12 @@ class Subject extends Controller
 		$code = isset($_GET["code"]) ? $_GET["code"] : null;
 
 		//set json data from request body
+		$code = $data->code;
 		$description = $data->description;
 		$unit = $data->unit;
 		$type = $data->type;
+		$schoolyear = $data->schoolYear;
+		$status = $data->status;
 
 
 		if (!SubjectModel::find($code, "code")) {
@@ -139,7 +133,7 @@ class Subject extends Controller
 			exit;
 		}
 
-		$result = SubjectModel::update($code, $description, $unit, $type);
+		$result = SubjectModel::update($code, $description, $unit, $type, $schoolyear, $status);
 
 		if (!$result) {
 			response(400, false, ["message" => "Update failed!"]);

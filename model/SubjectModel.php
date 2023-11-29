@@ -19,10 +19,12 @@ class SubjectModel
 		$code,
 		$description,
 		$unit,
-		$type
+		$type,
+		$schoolYear,
+		$status
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET code = :code, description = :description, unit = :unit, type = :type";
+			$query = "INSERT INTO " . self::TABLE . " SET code = :code, description = :description, unit = :unit, type = :type, status = :status, school_year = :schoolYear";
 
 			$stmt = Database::connect()->prepare($query);
 
@@ -30,6 +32,8 @@ class SubjectModel
 			$stmt->bindParam(":description", $description);
 			$stmt->bindParam(":unit", $unit);
 			$stmt->bindParam(":type", $type);
+			$stmt->bindParam(":schoolYear", $schoolYear);
+			$stmt->bindParam(":status", $status);
 
 			$result = $stmt->execute() ? true : false;
 			return $result;
@@ -146,10 +150,12 @@ class SubjectModel
 		$code,
 		$description,
 		$unit,
-		$type
+		$type,
+		$schoolYear,
+		$status
 	) {
 		try {
-			$query = "UPDATE " . self::TABLE . " SET  description = :description, unit = :unit, type = :type WHERE code = :code";
+			$query = "UPDATE " . self::TABLE . " SET  description = :description, unit = :unit, type = :type, status = :status, school_year = :schoolYear  WHERE code = :code";
 
 			$stmt = Database::connect()->prepare($query);
 
@@ -157,6 +163,8 @@ class SubjectModel
 			$stmt->bindParam(":description", $description);
 			$stmt->bindParam(":unit", $unit);
 			$stmt->bindParam(":type", $type);
+			$stmt->bindParam(":status", $status);
+			$stmt->bindParam(":schoolYear", $schoolYear);
 
 			$result = $stmt->execute() ? true : false;
 			return $result;
@@ -185,6 +193,29 @@ class SubjectModel
 
 			$result = $stmt->execute() ? true : false;
 
+			return $result;
+		} catch (PDOException $e) {
+			$response = [
+				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+			];
+			response(500, false, $response);
+			exit;
+		}
+	}
+	//*NOTE
+	//Update subject status based on the school year
+	//
+	public static function setSubjectStatus($schoolyear, $status)
+	{
+		try {
+			$query = "UPDATE " . self::TABLE . " SET status = :status WHERE school_year = :schoolyear";
+
+			$stmt = Database::connect()->prepare($query);
+
+			$stmt->bindParam(":schoolyear", $schoolyear);
+			$stmt->bindParam(":status", $status);
+
+			$result = $stmt->execute() ? true : false;
 			return $result;
 		} catch (PDOException $e) {
 			$response = [

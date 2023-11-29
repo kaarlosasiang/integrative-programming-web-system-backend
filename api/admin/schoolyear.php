@@ -5,8 +5,10 @@ namespace api\admin;
 use api\Controller;
 use model\SchoolYearModel;
 use middleware\AuthMiddleware;
+use model\SubjectModel;
 
 require_once(__DIR__ . "/../../model/SchoolYearModel.php");
+require_once(__DIR__ . "/../../model/SubjectModel.php");
 require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
 
@@ -57,10 +59,10 @@ class SchoolYear extends Controller
 		Controller::verifyJsonData($data);
 
 		//set json data from request body
-		$year = $data->year;
+		$schoolYear = $data->schoolYear;
 		$semester = $data->semester;
 
-		$result = SchoolYearModel::create($year, $semester);
+		$result = SchoolYearModel::create($schoolYear, $semester);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -106,16 +108,7 @@ class SchoolYear extends Controller
 
 		$numRows = count($results);
 
-		foreach ($results as $result) {
-
-			$returnData[] = [
-				"id" => $result["id"],
-				"year" => $result["year"],
-				"semester" => $result["semester"],
-				"status" => $result["status"]
-			];
-		}
-		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
+		response(200, true, ["row_count" => $numRows, "data" => $results]);
 	}
 	public function update()
 	{
@@ -126,7 +119,7 @@ class SchoolYear extends Controller
 		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		//set json data from request body
-		$year = $data->year;
+		$schoolYear = $data->schoolYear;
 		$semester = $data->semester;
 		$status = $data->status;
 
@@ -136,9 +129,14 @@ class SchoolYear extends Controller
 			exit;
 		}
 
-		$result = SchoolYearModel::update($id, $year, $semester, $status);
+		$schoolyear_update = SchoolYearModel::update($id, $schoolYear, $semester, $status);
 
-		if (!$result) {
+		//update subject status if subject exists
+		if (SubjectModel::find($schoolYear, "school_year")) {
+			SubjectModel::setSubjectStatus($id, $status);
+		}
+
+		if (!$schoolyear_update) {
 			response(400, false, ["message" => "Update failed!"]);
 			exit;
 		} else {

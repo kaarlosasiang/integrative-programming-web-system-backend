@@ -16,15 +16,15 @@ class SchoolYearModel
 	 * @return true if success
 	 */
 	public static function create(
-		$year,
+		$schoolYear,
 		$semester
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET year = :year, semester = :semester";
+			$query = "INSERT INTO " . self::TABLE . " SET school_year = :schoolYear, semester = :semester";
 
 			$stmt = Database::connect()->prepare($query);
 
-			$stmt->bindParam(":year", $year);
+			$stmt->bindParam(":schoolYear", $schoolYear);
 			$stmt->bindParam(":semester", $semester);
 
 			$result = $stmt->execute() ? true : false;
@@ -78,14 +78,14 @@ class SchoolYearModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE . " WHERE year LIKE :year OR semester LIKE :semester OR status LIKE :status";
+			$query = "SELECT * FROM " . self::TABLE . " WHERE school_year LIKE :school_year OR semester LIKE :semester OR status LIKE :status";
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
 
 			$searchPattern = "%" . $column . "%";
 
-			$stmt->bindParam(":year", $searchPattern);
+			$stmt->bindParam(":school_year", $searchPattern);
 			$stmt->bindParam(":semester", $searchPattern);
 			$stmt->bindParam(":status", $searchPattern);
 
@@ -141,17 +141,17 @@ class SchoolYearModel
 	 */
 	public static function update(
 		$id,
-		$year,
+		$schoolYear,
 		$semester,
 		$status
 	) {
 		try {
-			$query = "UPDATE " . self::TABLE . " SET year = :year, semester = :semester, status = :status WHERE id = :id";
+			$query = "UPDATE " . self::TABLE . " SET school_year = :schoolYear, semester = :semester, status = :status WHERE id = :id";
 
 			$stmt = Database::connect()->prepare($query);
 
 			$stmt->bindParam(":id", $id);
-			$stmt->bindParam(":year", $year);
+			$stmt->bindParam(":schoolYear", $schoolYear);
 			$stmt->bindParam(":semester", $semester);
 			$stmt->bindParam(":status", $status);
 
