@@ -21,12 +21,15 @@ class FacultyModel
 		$middlename,
 		$birthday,
 		$gender,
+		$email,
 		$contactNumber,
 		$institute,
-		$course
+		$course,
+		$password,
+		$role
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET first_name = :firstname, last_name = :lastname, middle_name = :middlename, birthday = :birthday, gender = :gender, contact_number = :contactNumber, institute = :institute, course = :course";
+			$query = "CALL InsertFaculty(:role, :firstname, :middlename, :lastname, :birthday, :gender, :email, :contactNumber, :password, :institute, :course)";
 
 			$stmt = Database::connect()->prepare($query);
 
@@ -35,9 +38,12 @@ class FacultyModel
 			$stmt->bindParam(":middlename", $middlename);
 			$stmt->bindParam(":birthday", $birthday);
 			$stmt->bindParam(":gender", $gender);
+			$stmt->bindParam(":email", $email);
 			$stmt->bindParam(":contactNumber", $contactNumber);
 			$stmt->bindParam(":institute", $institute);
 			$stmt->bindParam(":course", $course);
+			$stmt->bindParam(":password", $password);
+			$stmt->bindParam(":role", $role);
 
 			$result = $stmt->execute() ? true : false;
 			return $result;
@@ -58,7 +64,7 @@ class FacultyModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE . " WHERE $condition = :$condition";
+			$query = "SELECT * FROM " . self::TABLE . " JOIN users on faculty.user_id = users.user_id  WHERE $condition = :$condition";
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
@@ -90,7 +96,7 @@ class FacultyModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE . " WHERE first_name LIKE :firstName OR middle_name LIKE :middleName OR last_name LIKE :lastName";
+			$query = "SELECT * FROM " . self::TABLE . " JOIN users on faculty.user_id = users.user_id  WHERE first_name LIKE :firstName OR middle_name LIKE :middleName OR last_name LIKE :lastName";
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
@@ -125,7 +131,7 @@ class FacultyModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE;
+			$query = "SELECT f.faculty_id, u.first_name, u.middle_name, u.last_name, f.course, f.institute FROM " . self::TABLE . " f JOIN users u ON u.user_id = f.user_id";
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
 
@@ -151,28 +157,32 @@ class FacultyModel
 	 * @return bool true if successul
 	 */
 	public static function update(
-		$id,
+		$facultyId,
+		$userId,
 		$firstname,
 		$lastname,
 		$middlename,
 		$birthday,
 		$gender,
+		$email,
 		$contactNumber,
 		$institute,
 		$course
 	) {
 		try {
-			$query = "UPDATE " . self::TABLE . " SET first_name = :firstname, last_name = :lastname, middle_name = :middlename, birthday = :birthday, gender = :gender, contact_number = :contactNumber, institute = :institute, course = :course  WHERE id = :id";
+			$query = "CALL UpdateFaculty(:userId, :facultyId, :firstname, :middlename, :lastname, :birthday, :gender, :email, :contact, :institute, :course)";
 
 			$stmt = Database::connect()->prepare($query);
 
-			$stmt->bindParam(":id", $id);
+			$stmt->bindParam(":userId", $userId);
+			$stmt->bindParam(":facultyId", $facultyId);
 			$stmt->bindParam(":firstname", $firstname);
 			$stmt->bindParam(":lastname", $lastname);
 			$stmt->bindParam(":middlename", $middlename);
 			$stmt->bindParam(":birthday", $birthday);
 			$stmt->bindParam(":gender", $gender);
-			$stmt->bindParam(":contactNumber", $contactNumber);
+			$stmt->bindParam(":email", $email);
+			$stmt->bindParam(":contact", $contactNumber);
 			$stmt->bindParam(":institute", $institute);
 			$stmt->bindParam(":course", $course);
 

@@ -3,10 +3,16 @@
 namespace api\admin;
 
 use api\Controller;
+use model\UserModel;
+use model\CourseModel;
 use model\FacultyModel;
+use model\InstituteModel;
 use middleware\AuthMiddleware;
 
 require_once(__DIR__ . "/../../model/FacultyModel.php");
+require_once(__DIR__ . "/../../model/CourseModel.php");
+require_once(__DIR__ . "/../../model/InstituteModel.php");
+require_once(__DIR__ . "/../../model/UserModel.php");
 require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
 
@@ -62,12 +68,32 @@ class Faculty extends Controller
 		$middlename = $data->middlename;
 		$birthday = $data->birthday;
 		$gender = $data->gender;
+		$email = $data->email;
 		$contact = $data->contact;
 		$course = $data->course;
 		$institute = $data->institute;
 
+		//verify if email is already taken
+		$fetchEmail = UserModel::find($email, "email");
+		if ($fetchEmail) {
+			response(409, false, ["message" => "Email already taken"]);
+			exit;
+		}
 
-		$result = FacultyModel::create($firstname, $lastname, $middlename, $birthday, $gender, $contact, $institute, $course);
+		if (!CourseModel::find($course, "slug")) {
+			response(400, false, ["message" => "Course does not exists"]);
+			exit;
+		}
+
+		if (!InstituteModel::find($institute, "slug")) {
+			response(400, false, ["message" => "Insitute does not exists"]);
+			exit;
+		}
+
+		//default password
+		$password = password_hash("dorsu_faculty", PASSWORD_DEFAULT);
+
+		$result = FacultyModel::create($firstname, $lastname, $middlename, $birthday, $gender, $email, $contact, $institute, $course, $password, Controller::FACULTY_ROLE);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -78,9 +104,9 @@ class Faculty extends Controller
 	}
 	public function show()
 	{
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
+		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
 
-		$results = FacultyModel::find($id, "id");
+		$results = FacultyModel::find($facultyId, "faculty_id");
 
 		if (!$results) {
 			response(404, false, ["message" => "Faculty not found!"]);
@@ -112,31 +138,15 @@ class Faculty extends Controller
 
 		$numRows = count($results);
 
-		foreach ($results as $result) {
-
-			$returnData[] = [
-				"id" => $result["id"],
-				"firstname" => $result["first_name"],
-				"lastname" => $result["last_name"],
-				"middlename" => $result["middle_name"],
-				"birthday" => $result["birthday"],
-				"gender" => $result["gender"],
-				"contact" => $result["contact_number"],
-				"institute" => $result["institute"],
-				"course" => $result["course"],
-				"registered_at" => $result["registered_at"],
-				"updated_at" => $result["updated_at"]
-			];
-		}
-		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
+		response(200, true, ["row_count" => $numRows, "data" => $results]);
 	}
 	public function update()
 	{
+		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
+
 		$data = json_decode(file_get_contents("php://input"));
 
 		Controller::verifyJsonData($data);
-
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		//set json data from request body
 		$firstname = $data->firstname;
@@ -144,37 +154,49 @@ class Faculty extends Controller
 		$middlename = $data->middlename;
 		$birthday = $data->birthday;
 		$gender = $data->gender;
+		$email = $data->email;
 		$contact = $data->contact;
 		$course = $data->course;
 		$institute = $data->institute;
 
+		$faculty = FacultyModel::find($facultyId, "faculty_id");
 
-		if (!FacultyModel::find($id, "id")) {
+		if (!$faculty) {
 			response(404, false, ["message" => "Faculty not found!"]);
 			exit;
 		}
 
-		$result = FacultyModel::update($id, $firstname, $lastname, $middlename, $birthday, $gender, $contact, $institute, $course);
+		if (!CourseModel::find($course, "slug")) {
+			response(400, false, ["message" => "Course does not exists"]);
+			exit;
+		}
+
+		if (!InstituteModel::find($institute, "slug")) {
+			response(400, false, ["message" => "Insitute does not exists"]);
+			exit;
+		}
+
+		$result = FacultyModel::update($facultyId, $faculty["user_id"], $firstname, $lastname, $middlename, $birthday, $gender, $email, $contact, $institute, $course);
 
 		if (!$result) {
 			response(400, false, ["message" => "Update failed!"]);
 			exit;
 		} else {
-			response(201, true, ["message" => "Update successfull!"]);
+			response(201, true, ["message" => "Updated successfully!"]);
 		}
 	}
 	public function delete()
 	{
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
+		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
 
-		$results = FacultyModel::find($id, "id");
+		$results = FacultyModel::find($facultyId, "faculty_id");
 
 		if (!$results) {
 			response(404, false, ["message" => "Faculty not found!"]);
 			exit;
 		}
 
-		if (FacultyModel::delete($id, "id")) {
+		if (UserModel::delete($results["user_id"], "user_id")) {
 			response(200, true, ["message" => "Delete successful"]);
 		} else {
 			response(400, false, ["message" => "Delete Failed!"]);
