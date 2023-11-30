@@ -226,4 +226,35 @@ class FacultyModel
 			exit;
 		}
 	}
+	public static function fetchId($column, $condition, $fetchAll = false)
+	{
+		try {
+			//query statement
+			$query = "SELECT * FROM " . self::TABLE . "  WHERE $condition = :$condition";
+
+			//prepared statement
+			$stmt = Database::connect()->prepare($query);
+
+			$stmt->bindParam(":$condition", $column);
+			$stmt->execute();
+			//verifies if there's a returned value
+			if ($stmt->rowCount() == 0) {
+				return null;
+				exit;
+			}
+			//fetch and return result
+			if ($fetchAll === true) {
+				$result = $stmt->fetchAll();
+			} else {
+				$result = $stmt->fetch();
+			}
+			return $result;
+		} catch (PDOException $e) {
+			$response = [
+				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+			];
+			response(500, false, $response);
+			exit;
+		}
+	}
 }

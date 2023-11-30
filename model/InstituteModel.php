@@ -66,6 +66,7 @@ class InstituteModel
 			} else {
 				$result = $stmt->fetch();
 			}
+			return $result;
 		} catch (PDOException $e) {
 			$response = [
 				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
