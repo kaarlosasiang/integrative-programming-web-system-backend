@@ -49,9 +49,9 @@ class Dashboard extends Controller
 		$ftedCount =  $fted == null ? 0 : count($fted);
 		$falsCount = $fals == null ? 0 : count($fals);
 
-		$studentCountByCourse = StudentModel::studentCountByCourse($courses);
+		$studentCountByCourse[] = StudentModel::studentCountByCourse($courses);
 
-		$studentCountByInsitute = [
+		$studentCountByInsitute[] = [
 			"fcdset_count" => $fcdsetCount,
 			"fgbm_count" => $fgbmCount,
 			"fnahs_count" => $fnahsCount,
