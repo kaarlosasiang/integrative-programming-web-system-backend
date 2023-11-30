@@ -49,21 +49,13 @@ class Dashboard extends Controller
 		$ftedCount =  $fted == null ? 0 : count($fted);
 		$falsCount = $fals == null ? 0 : count($fals);
 
-		$studentCountByCourse[] = StudentModel::studentCountByCourse($courses);
-
-		$studentCountByInsitute[] = [
-			"fcdset_count" => $fcdsetCount,
-			"fgbm_count" => $fgbmCount,
-			"fnahs_count" => $fnahsCount,
-			"fted_count" => $ftedCount,
-			"fals_count" => $falsCount
-		];
+		$studentCountByCourse = StudentModel::studentCountByCourse($courses);
 
 		response(200, true, [
 			"student_count" => $studentCount,
 			"faculty_count" => $facultiesCount,
-			"student_count_by_institute" => [$studentCountByInsitute],
-			"student_count_by_course" => [$studentCountByCourse]
+			"student_count_by_institute" => ["FCDSET" => $fcdsetCount, "FGBM" => $fgbmCount, "FNAHS" => $fnahsCount, "FALS" => $falsCount, "FTED" => $ftedCount],
+			"student_count_by_course" => $studentCountByCourse
 		]);
 	}
 }
