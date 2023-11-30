@@ -60,11 +60,10 @@ class Dashboard extends Controller
 			"fals_count" => $falsCount
 		];
 
-
 		response(200, true, [
 			"student_count" => $studentCount,
 			"student_count_by_institute" => $studentCountByInsitute,
-			"student_count_by_course" => $studentCountByCourse
+			"student_count_by_course" => [$studentCountByCourse]
 		]);
 	}
 }
