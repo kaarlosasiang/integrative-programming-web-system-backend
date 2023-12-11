@@ -60,15 +60,10 @@ class Dashboard extends Controller
 
 		$studentCountByCourse = StudentModel::studentCountByCourse($courses);
 
-
 		response(200, true, [
 			"student_count" => $studentCount,
 			"faculty_count" => $facultiesCount,
-			"fcdset_count" => $fcdsetCount,
-			"fgbm_count" => $fgbmCount,
-			"fnahs_count" => $fnahsCount,
-			"fted_count" => $ftedCount,
-			"fals_count" => $falsCount,
+			"student_count_by_institute" => ["FCDSET" => $fcdsetCount, "FGBM" => $fgbmCount, "FNAHS" => $fnahsCount, "FALS" => $falsCount, "FTED" => $ftedCount],
 			"student_count_by_course" => $studentCountByCourse
 		]);
 	}
