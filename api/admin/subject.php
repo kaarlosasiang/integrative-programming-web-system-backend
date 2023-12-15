@@ -7,6 +7,7 @@ use model\SubjectModel;
 use middleware\AuthMiddleware;
 use model\FacultyModel;
 use model\SchoolYearModel;
+use model\UserModel;
 
 require_once(__DIR__ . "/../../model/SubjectModel.php");
 require_once(__DIR__ . "/../../model/FacultyModel.php");
@@ -65,9 +66,8 @@ class Subject extends Controller
 		$type = $data->type;
 		$schoolyear = $data->schoolYear;
 		$status = $data->status;
-		$faculty = $data->faculty;
 
-		$result = SubjectModel::create($code, $description, $unit, $type, $schoolyear, $status, $faculty);
+		$result = SubjectModel::create($code, $description, $unit, $type, $schoolyear, $status);
 
 		if (!$result) {
 			response(400, false, ["message" => "Registration failed!"]);
@@ -89,10 +89,6 @@ class Subject extends Controller
 
 		$schoolyear = SchoolYearModel::find($results["school_year"], "id")["school_year"];
 
-		//fetch faculty assigned
-		$faculty = FacultyModel::find($results["faculty"], "faculty_id");
-		$facultyName = $faculty["first_name"] . " " . $faculty["middle_name"] . " " . $faculty["last_name"];
-
 
 		$returnData = [
 			"code" => $results["code"],
@@ -101,7 +97,6 @@ class Subject extends Controller
 			"type" => $results["type"],
 			"status" => $results["status"],
 			"school_year" => $schoolyear,
-			"faculty" => $facultyName,
 			"created_at" => $results["created_at"],
 			"updated_at" => $results["updated_at"]
 		];
@@ -121,10 +116,6 @@ class Subject extends Controller
 		foreach ($results as $result) {
 			$schoolyear = SchoolYearModel::find($result["school_year"], "id")["school_year"];
 
-			//fetch faculty assigned
-			$faculty = FacultyModel::find($result["faculty"], "faculty_id");
-			$facultyName = $faculty["first_name"] . " " . $faculty["middle_name"] . " " . $faculty["last_name"];
-
 			$returnData[] = [
 				"code" => $result["code"],
 				"description" => $result["description"],
@@ -132,7 +123,6 @@ class Subject extends Controller
 				"type" => $result["type"],
 				"status" => $result["status"],
 				"school_year" => $schoolyear,
-				"faculty" => $facultyName,
 				"created_at" => $result["created_at"],
 				"updated_at" => $result["updated_at"]
 			];
@@ -152,18 +142,13 @@ class Subject extends Controller
 		foreach ($results as $result) {
 			$schoolyear = SchoolYearModel::find($result["school_year"], "id")["school_year"];
 
-			//fetch faculty assigned
-			$faculty = FacultyModel::find($result["faculty"], "faculty_id");
-			$facultyName = $faculty["first_name"] . " " . $faculty["middle_name"] . " " . $faculty["last_name"];
-
 			$returnData[] = [
 				"code" => $result["code"],
 				"description" => $result["description"],
 				"unit" => $result["unit"],
 				"type" => $result["type"],
 				"status" => $result["status"],
-				"school_year" => $schoolyear,
-				"faculty" => $facultyName
+				"school_year" => $schoolyear
 			];
 		}
 
@@ -185,14 +170,13 @@ class Subject extends Controller
 		$type = $data->type;
 		$schoolyear = $data->schoolYear;
 		$status = $data->status;
-		$faculty = $data->faculty;
 
 		if (!SubjectModel::find($code, "code")) {
 			response(404, false, ["message" => "Subject not found!"]);
 			exit;
 		}
 
-		$result = SubjectModel::update($code, $description, $unit, $type, $schoolyear, $status, $faculty);
+		$result = SubjectModel::update($code, $description, $unit, $type, $schoolyear, $status);
 
 		if (!$result) {
 			response(400, false, ["message" => "Update failed!"]);
@@ -218,5 +202,13 @@ class Subject extends Controller
 			response(400, false, ["message" => "Delete Failed!"]);
 		}
 	}
+	// private function getFacultyFullname($facultyId)
+	// {
+	// 	dd($facultyId);
+	// 	$facultyId = FacultyModel::find($facultyId, "faculty_id");
+	// 	$faculty = UserModel::find($facultyId["user_id"], "user_id");
+	// 	$middlename = substr($faculty["middle_name"], 0, 1) . ".";
+	// 	return $faculty["first_name"] . " $middlename " . $faculty["last_name"];
+	// }
 }
 new Subject();

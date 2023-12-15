@@ -7,33 +7,26 @@ use PDOException;
 
 require_once(__DIR__ . "/../database/Database.php");
 
-class SubjectModel
+class FacultySubjectsModel
 {
-	private const TABLE = "subjects";
+	private const TABLE = "faculty_subjects";
 
 	/**
 	 * Perform insert operation to the database
 	 * @return true if success
 	 */
 	public static function create(
-		$code,
-		$description,
-		$unit,
-		$type,
-		$schoolYear,
-		$status
+		$subject_code,
+		$faculty_id
 	) {
 		try {
-			$query = "INSERT INTO " . self::TABLE . " SET code = :code, description = :description, unit = :unit, type = :type, status = :status, school_year = :schoolYear";
+			$query = "INSERT INTO " . self::TABLE . " SET subject_code = :subjectCode, faculty_id = :facultyId";
 
 			$stmt = Database::connect()->prepare($query);
 
-			$stmt->bindParam(":code", $code);
-			$stmt->bindParam(":description", $description);
-			$stmt->bindParam(":unit", $unit);
-			$stmt->bindParam(":type", $type);
-			$stmt->bindParam(":schoolYear", $schoolYear);
-			$stmt->bindParam(":status", $status);
+			$stmt->bindParam(":subjectCode", $subject_code);
+			$stmt->bindParam(":facultyId", $faculty_id);
+
 
 			$result = $stmt->execute() ? true : false;
 			return $result;
@@ -66,7 +59,7 @@ class SubjectModel
 				return null;
 				exit;
 			}
-			//fetch and return result
+
 			if ($fetchAll === true) {
 				$result = $stmt->fetchAll();
 			} else {
@@ -90,15 +83,15 @@ class SubjectModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE . " WHERE code LIKE :code OR description LIKE :description";
+			$query = "SELECT * FROM " . self::TABLE . " WHERE faculty_id LIKE :facultyId OR subject_code LIKE :subjectCode";
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
 
 			$searchPattern = "%" . $column . "%";
 
-			$stmt->bindParam(":code", $searchPattern);
-			$stmt->bindParam(":description", $searchPattern);
+			$stmt->bindParam(":facultyId", $searchPattern);
+			$stmt->bindParam(":subjectCode", $searchPattern);
 
 			$stmt->execute();
 			//verifies if there's a returned value
@@ -126,6 +119,7 @@ class SubjectModel
 		try {
 			//query statement
 			$query = "SELECT * FROM " . self::TABLE;
+
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);
 
@@ -150,37 +144,29 @@ class SubjectModel
 	 * Update data set based on the condition
 	 * @return bool true if successul
 	 */
-	public static function update(
-		$code,
-		$description,
-		$unit,
-		$type,
-		$schoolYear,
-		$status
-	) {
-		try {
-			$query = "UPDATE " . self::TABLE . " SET  description = :description, unit = :unit, type = :type, status = :status, school_year = :schoolYear WHERE code = :code";
+	// public static function update(
+	// 	$subject_code,
+	// 	$faculty_id
+	// ) {
+	// 	try {
+	// 		$query = "UPDATE " . self::TABLE . " SET subject_code = :subjectCode, faculty_id = :facultyId";
 
-			$stmt = Database::connect()->prepare($query);
+	// 		$stmt = Database::connect()->prepare($query);
 
-			$stmt->bindParam(":code", $code);
-			$stmt->bindParam(":description", $description);
-			$stmt->bindParam(":unit", $unit);
-			$stmt->bindParam(":type", $type);
-			$stmt->bindParam(":status", $status);
-			$stmt->bindParam(":schoolYear", $schoolYear);
+	// 		$stmt->bindParam(":subjectCode", $subject_code);
+	// 		$stmt->bindParam(":facultyId", $faculty_id);
 
 
-			$result = $stmt->execute() ? true : false;
-			return $result;
-		} catch (PDOException $e) {
-			$response = [
-				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
-			];
-			response(500, false, $response);
-			exit;
-		}
-	}
+	// 		$result = $stmt->execute() ? true : false;
+	// 		return $result;
+	// 	} catch (PDOException $e) {
+	// 		$response = [
+	// 			"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+	// 		];
+	// 		response(500, false, $response);
+	// 		exit;
+	// 	}
+	// }
 	/**
 	 * Delete data on the database
 	 * @return bool true if successful
@@ -198,29 +184,6 @@ class SubjectModel
 
 			$result = $stmt->execute() ? true : false;
 
-			return $result;
-		} catch (PDOException $e) {
-			$response = [
-				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
-			];
-			response(500, false, $response);
-			exit;
-		}
-	}
-	//*NOTE
-	//Update subject status based on the school year
-	//
-	public static function setSubjectStatus($schoolyear, $status)
-	{
-		try {
-			$query = "UPDATE " . self::TABLE . " SET status = :status WHERE school_year = :schoolyear";
-
-			$stmt = Database::connect()->prepare($query);
-
-			$stmt->bindParam(":schoolyear", $schoolyear);
-			$stmt->bindParam(":status", $status);
-
-			$result = $stmt->execute() ? true : false;
 			return $result;
 		} catch (PDOException $e) {
 			$response = [
