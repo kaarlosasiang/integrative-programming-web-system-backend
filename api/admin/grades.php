@@ -10,9 +10,11 @@ use model\SubjectModel;
 use model\SchoolYearModel;
 use middleware\AuthMiddleware;
 use model\FacultySubjectsModel;
+use model\StudentModel;
 
 require_once(__DIR__ . "/../../model/SubjectModel.php");
 require_once(__DIR__ . "/../../model/FacultyModel.php");
+require_once(__DIR__ . "/../../model/StudentModel.php");
 require_once(__DIR__ . "/../../model/FacultySubjectsModel.php");
 require_once(__DIR__ . "/../../model/GradesModel.php");
 require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
@@ -30,13 +32,25 @@ class Grades extends Controller
 
 		switch ($requestMethod) {
 			case "POST": {
-					$this->create();
+					if (array_key_exists("id", $_GET) || !empty($_GET["id"]) && array_key_exists("action", $_GET) && ($_GET["action"] === "assign_faculty")) {
+						$this->assignFaculty();
+					} else if (array_key_exists("action", $_GET) && ($_GET["action"] === "assign_student")) {
+						$this->assignStudent();
+					}
 					break;
 				}
 			case "GET": {
-					if (array_key_exists("id", $_GET) || !empty($_GET["id"])) {
+					if (array_key_exists("action", $_GET) && $_GET["action"] == "unassigned_subjects") {
+						// echo "2";
+						$this->facultyUnassignedSubjects();
+					} else if (array_key_exists("action", $_GET) &&  $_GET["action"] == "student_records") {
+						// echo "3";
+						$this->fetchStudentRecords();
+					} else if (array_key_exists("id", $_GET) || !empty($_GET["id"])) {
+						// echo "4";
 						$this->facultySubjects();
 					} else {
+						// echo "5";
 						$this->all();
 					}
 					break;
@@ -55,7 +69,47 @@ class Grades extends Controller
 				}
 		}
 	}
-	public function create()
+	public function assignStudent()
+	{
+		$data = json_decode(file_get_contents("php://input"));
+
+		Controller::verifyJsonData($data);
+
+		//set json data from request body
+		$code = isset($_GET["code"]) ? $_GET["code"] : null;
+
+		$facultyId = $data->facultyId;
+		$studentId = $data->studentId;
+
+		$facultyAssignedSubjects = FacultySubjectsModel::find($facultyId, "faculty_id", true);
+
+		if (!$facultyAssignedSubjects) {
+			response(200, false, ["message" => "Subject is not handled by the faculty chosen!"]);
+			exit;
+		}
+
+		$isStudentAssigned = GradesModel::where([
+			"faculty_id" => $facultyId,
+			"subject_code" => $code
+		]);
+
+
+		if ($isStudentAssigned) {
+			response(409, false, ["message" => "Student is already enrolled to this subject!"]);
+			exit;
+		}
+
+		$result = GradesModel::create($code, $studentId, $facultyId);
+
+		if (!$result) {
+			response(400, false, ["message" => "Assignment Failed failed!"]);
+			exit;
+		} else {
+			response(201, true, ["message" => "Assigned successfully!"]);
+		}
+	}
+
+	public function assignFaculty()
 	{
 		$data = json_decode(file_get_contents("php://input"));
 
@@ -63,12 +117,13 @@ class Grades extends Controller
 
 		//set json data from request body
 		$code = $data->subjectCode;
-		$facultyId = $data->facultyId;
+
+		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
 
 		$result = FacultySubjectsModel::create($code, $facultyId);
 
 		if (!$result) {
-			response(400, false, ["message" => "Assignment Failed failed!"]);
+			response(400, false, ["message" => "Assignment Failed!"]);
 			exit;
 		} else {
 			response(201, true, ["message" => "Assigned successfully!"]);
@@ -120,6 +175,142 @@ class Grades extends Controller
 		$numRows = count($results);
 
 		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
+	}
+	public function facultyUnassignedSubjects()
+	{
+		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
+
+		$results = FacultySubjectsModel::find($facultyId, "faculty_id", true);
+
+		$subjects = SubjectModel::all();
+
+		//if faculty has no assigned subjects, iterate all subjects
+		if (!$results) {
+			foreach ($subjects as $subject) {
+				$returnData[] = [
+					"code" => $subject["code"],
+					"description" => $subject["description"],
+					"unit" => $subject["unit"],
+					"type" => $subject["type"],
+					"status" => $subject["status"],
+					"created_at" => $subject["created_at"],
+					"updated_at" => $subject["updated_at"]
+				];
+			}
+		} else {
+			// Extract subject codes from $results
+			$resultSubjectCodes = array_column($results, 'subject_code');
+
+			// Filter subjects that are not in $results
+			$missingSubjects = array_filter($subjects, function ($subject) use ($resultSubjectCodes) {
+				return !in_array($subject['code'], $resultSubjectCodes);
+			});
+			//iterate all unassigned subjects
+			foreach ($missingSubjects as $missingSubject) {
+				$returnData[] = $missingSubject;
+			}
+		}
+		response(200, true, ["data" => $returnData]);
+	}
+	public function fetchStudentRecords()
+	{
+		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
+		$subjectCode = isset($_GET["subject_code"]) ? $_GET["subject_code"] : null;
+
+		$results = FacultyModel::find($facultyId, "faculty_id");
+
+		if (!$results) {
+			response(404, false, ["message" => "Faculty not found!"]);
+			exit;
+		}
+
+		//fetch students based on enrolled subject and faculty
+		$fetchAssignedStudents = GradesModel::where([
+			"subject_code" => $subjectCode,
+			"faculty_id" => $facultyId
+		], true);
+
+		if (!$fetchAssignedStudents) {
+			response(200, true, ["message" => "No enrolled students currently!"]);
+			exit;
+		}
+		//initialized return data
+		$returnData = [];
+
+		//loop through enrolled students
+		foreach ($fetchAssignedStudents as $assignedStudent) {
+			$studentName = StudentModel::find($assignedStudent["student_id"], "student_id");
+			$studentName = UserModel::find($studentName["user_id"], "user_id");
+			// Format fullname
+			$middlename = substr($studentName["middle_name"], 0, 1) . ".";
+			$fullname = $studentName["first_name"] . " $middlename " . $studentName["last_name"];
+
+			$returnData[] = [
+				"student_id" => $assignedStudent["student_id"],
+				"fullname" => $fullname,
+				"subject_code" => $assignedStudent["subject_code"],
+				"grade" => $assignedStudent["grades"]
+			];
+		}
+
+		response(200, true, ["data" => $returnData]);
+	}
+	public function fetchUnassignedStudents()
+	{
+		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
+		$subjectCode = isset($_GET["subject_code"]) ? $_GET["subject_code"] : null;
+
+		$results = FacultyModel::find($facultyId, "faculty_id");
+
+		if (!$results) {
+			response(404, false, ["message" => "Faculty not found!"]);
+			exit;
+		}
+
+		$students = StudentModel::all();
+
+		$fetchAssignedStudents = GradesModel::where([
+			"subject_code" => $subjectCode,
+			"faculty_id" => $facultyId
+		], true);
+
+		// Initialize $returnData as an empty array
+		$returnData = [];
+
+		if ($fetchAssignedStudents) {
+			// Extract student IDs from the result
+			$assignedStudentsIds = array_column($fetchAssignedStudents, 'student_id');
+
+			// Filter unassigned students
+			$unassignedStudents = array_filter($students, function ($student) use ($assignedStudentsIds) {
+				return !in_array($student['student_id'], $assignedStudentsIds);
+			});
+
+			foreach ($unassignedStudents as $unassignedStudent) {
+				// Format fullname
+				$middlename = substr($unassignedStudent["middle_name"], 0, 1) . ".";
+				$fullname = $unassignedStudent["first_name"] . " $middlename " . $unassignedStudent["last_name"];
+
+				$returnData[] = [
+					"student_id" => $unassignedStudent["student_id"],
+					"fullname" => $fullname
+				];
+			}
+		} else {
+			// If no assigned students, loop through all students
+			foreach ($students as $student) {
+				// Format fullname
+				$middlename = substr($student["middle_name"], 0, 1) . ".";
+				$fullname = $student["first_name"] . " $middlename " . $student["last_name"];
+
+				$returnData[] = [
+					"student_id" => $student["student_id"],
+					"fullname" => $fullname
+				];
+			}
+		}
+
+		response(200, true, ["data" => $returnData]);
 	}
 	private function getFacultyFullname($facultyUserId)
 	{

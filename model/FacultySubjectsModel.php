@@ -40,8 +40,6 @@ class FacultySubjectsModel
 	}
 	/**
 	 * Perform fetch operation strictly  based on the condition
-	 * @return null if condition is not found
-	 * @return array result
 	 */
 	public static function find($column, $condition, $fetchAll = false)
 	{
