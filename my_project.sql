@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 19, 2023 at 04:18 PM
+-- Generation Time: Dec 29, 2023 at 09:09 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -20,36 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `my_project`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `admin`
---
-
-CREATE TABLE `admin` (
-  `user_id` int(11) NOT NULL,
-  `first_name` varchar(45) NOT NULL,
-  `last_name` varchar(45) NOT NULL,
-  `birthday` date NOT NULL,
-  `gender` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `phone_number` varchar(15) DEFAULT NULL,
-  `password` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `admin`
---
-
-INSERT INTO `admin` (`user_id`, `first_name`, `last_name`, `birthday`, `gender`, `email`, `phone_number`, `password`) VALUES
-(27, 'Clarence', 'Japinan', '2023-10-04', 'female', 'test@test.com', '09510312859', '$2y$10$HBHh.CL1HNGHh5zJcOKSLeB5gqqO7p0EHOivZV1ppstGUmAMNd2Be'),
-(28, 'Diane', 'Doe', '2023-09-10', 'male', 'dianne@gmail.com', '09128347865', '$2y$10$lRIKpkUvh8en48ihHm.EwuA0pwrnOGXy0SiQg9Y0BpjtCvG2SJMsG'),
-(47, 'John', 'Doe', '2023-11-02', 'male', 'john@gmail.com', '09123456789', '$2y$10$PumhXShcT5uQ3eviJ2eINuYL9z5R8kLszjQmL6jzrVVoTpfogv5Fa'),
-(48, 'Jade', 'Lore', '2023-11-02', 'male', 'jade@gmail.com', '09123456789', '$2y$10$AIT3xyYU5NQp.UW/tPzAyeoA/Z4ey/kw7DfWFHAJ6KPmFvcolcfrW'),
-(50, 'Jonathan', 'Dale', '2023-11-03', 'female', 'jonathan@gmail.com', '09123456789', '$2y$10$ZfCw3CLWJr9QS8HayZxsR.lxzxzuyJZP9fOnBNqInKKG2WHWmCdrK'),
-(63, 'Clarence', 'Japinan', '2023-11-03', 'female', 'japinanclarence@gmail.com', '09510312859', '$2y$10$b3EPe88wKHmCQyOvw/nIOOSFw0s.P3kp5/g/F0.lsX3Z5LbvyyNrS'),
-(64, 'Roche', 'Santiago', '0000-00-00', '', 'rocheSantiago@gmail.com', NULL, '$2y$10$0mecrEjFBn/qbB0ntsI9tOsJ3oNksykdMSSy76M.TlnjLlG/MgTk2');
 
 -- --------------------------------------------------------
 
@@ -84,15 +54,10 @@ INSERT INTO `course` (`id`, `title`, `slug`, `description`, `institute`, `create
 --
 
 CREATE TABLE `faculty` (
-  `id` int(11) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `middle_name` varchar(50) NOT NULL,
-  `birthday` date NOT NULL,
-  `gender` varchar(20) NOT NULL,
+  `faculty_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `institute` varchar(10) NOT NULL,
   `course` varchar(10) NOT NULL,
-  `contact_number` varchar(15) NOT NULL,
   `registered_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -101,9 +66,29 @@ CREATE TABLE `faculty` (
 -- Dumping data for table `faculty`
 --
 
-INSERT INTO `faculty` (`id`, `first_name`, `last_name`, `middle_name`, `birthday`, `gender`, `institute`, `course`, `contact_number`, `registered_at`, `updated_at`) VALUES
-(4, 'David', 'Ross', 'Mo', '2000-12-27', 'male', 'FTED', 'BPED', '09123456789', '2023-11-19 22:45:14', NULL),
-(6, 'Michelle', 'Dee', 'Mo', '2000-12-27', 'male', 'FGBM', 'BSCRIM', '09123456789', '2023-11-19 22:48:13', NULL);
+INSERT INTO `faculty` (`faculty_id`, `user_id`, `institute`, `course`, `registered_at`, `updated_at`) VALUES
+(9, 76, 'FCDSET', 'BSIT', '2023-11-29 22:27:52', NULL),
+(10, 77, 'FGBM', 'BSCRIM', '2023-11-29 23:48:29', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `faculty_subjects`
+--
+
+CREATE TABLE `faculty_subjects` (
+  `faculty_id` int(11) NOT NULL,
+  `subject_code` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `faculty_subjects`
+--
+
+INSERT INTO `faculty_subjects` (`faculty_id`, `subject_code`) VALUES
+(9, '123'),
+(9, 'ITPE130'),
+(10, '1234');
 
 -- --------------------------------------------------------
 
@@ -133,22 +118,40 @@ INSERT INTO `institute` (`id`, `title`, `slug`, `description`, `created_at`, `up
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `schoolyear`
+--
+
+CREATE TABLE `schoolyear` (
+  `id` int(10) NOT NULL,
+  `school_year` varchar(10) NOT NULL,
+  `semester` varchar(5) NOT NULL,
+  `status` enum('0','1') NOT NULL DEFAULT '1',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `schoolyear`
+--
+
+INSERT INTO `schoolyear` (`id`, `school_year`, `semester`, `status`, `created_at`, `updated_at`) VALUES
+(1, '2022-2023', '1st', '0', '2023-11-29 04:39:10', '2023-11-29 23:26:43'),
+(3, '2023-2024', '1st', '1', '2023-11-29 21:54:33', NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `students`
 --
 
 CREATE TABLE `students` (
   `student_id` varchar(10) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `middle_name` varchar(50) NOT NULL,
-  `birthday` date NOT NULL,
-  `gender` varchar(20) NOT NULL,
-  `purok` varchar(255) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `street` varchar(255) NOT NULL,
   `barangay` varchar(255) NOT NULL,
   `municipality` varchar(255) NOT NULL,
   `province` varchar(255) NOT NULL,
   `zipcode` varchar(4) NOT NULL,
-  `contact_number` varchar(15) NOT NULL,
   `institute` varchar(10) NOT NULL,
   `course` varchar(10) NOT NULL,
   `guardian_name` varchar(50) NOT NULL,
@@ -162,11 +165,33 @@ CREATE TABLE `students` (
 -- Dumping data for table `students`
 --
 
-INSERT INTO `students` (`student_id`, `first_name`, `last_name`, `middle_name`, `birthday`, `gender`, `purok`, `barangay`, `municipality`, `province`, `zipcode`, `contact_number`, `institute`, `course`, `guardian_name`, `guardian_contact`, `guardian_address`, `registered_at`, `updated_at`) VALUES
-('2023-0001', 'Jonathan', 'David', 'Dee', '2000-12-27', 'male', 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FCDSET', 'BSIT', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-14 18:55:48', NULL),
-('2023-0003', 'Jonathan', 'David', 'Dee', '2000-12-27', 'male', 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FCDSET', 'BSIT', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-15 05:10:40', NULL),
-('2023-0004', 'Yasmin', 'Mendoza', 'Rosete', '2000-02-21', 'female', 'Mandalihan', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FTED', 'BPED', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-19 22:46:22', NULL),
-('2023-0005', 'Jaquiline', 'Dela Cuadra', 'Rosete', '2000-02-21', 'female', 'San Vicente', 'Corporacion', 'Lupon', 'Davao Oriental', '8207', '09123456789', 'FGBM', 'BSCRIM', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-19 22:49:14', NULL);
+INSERT INTO `students` (`student_id`, `user_id`, `street`, `barangay`, `municipality`, `province`, `zipcode`, `institute`, `course`, `guardian_name`, `guardian_contact`, `guardian_address`, `registered_at`, `updated_at`) VALUES
+('2023-0002', 71, 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', 'FTED', 'BPED', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-29 17:50:50', '2023-11-29 17:55:11'),
+('2023-0003', 72, 'Baybay', 'Poblacion', 'Lupon', 'Davao Oriental', '8207', 'FTED', 'BPED', 'Jane Doe', '09123456789', 'Mauswagon, Corporacion, Lupon, Davao Oriental', '2023-11-29 17:51:13', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_subjects`
+--
+
+CREATE TABLE `student_subjects` (
+  `subject_code` varchar(10) NOT NULL,
+  `student_id` varchar(10) NOT NULL,
+  `faculty_id` int(11) NOT NULL,
+  `grades` int(5) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `student_subjects`
+--
+
+INSERT INTO `student_subjects` (`subject_code`, `student_id`, `faculty_id`, `grades`, `created_at`, `updated_at`) VALUES
+('123', '2023-0002', 9, NULL, '2023-12-29 04:40:01', NULL),
+('123', '2023-0003', 9, NULL, '2023-12-29 00:19:03', NULL),
+('ITPE130', '2023-0003', 9, NULL, '2023-12-29 00:11:56', NULL);
 
 -- --------------------------------------------------------
 
@@ -179,6 +204,8 @@ CREATE TABLE `subjects` (
   `description` text NOT NULL,
   `unit` varchar(2) NOT NULL,
   `type` enum('lecture','laboratory','lecture & laboratory') NOT NULL,
+  `status` enum('0','1') NOT NULL DEFAULT '1',
+  `school_year` int(10) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -187,19 +214,44 @@ CREATE TABLE `subjects` (
 -- Dumping data for table `subjects`
 --
 
-INSERT INTO `subjects` (`code`, `description`, `unit`, `type`, `created_at`, `updated_at`) VALUES
-('112223', 'Description', '4', '', '2023-11-18 09:05:51', NULL),
-('1234', 'Sample description', '4', 'laboratory', '2023-11-18 07:07:45', NULL);
+INSERT INTO `subjects` (`code`, `description`, `unit`, `type`, `status`, `school_year`, `created_at`, `updated_at`) VALUES
+('123', 'Description', '4', 'lecture & laboratory', '1', 3, '2023-12-15 12:07:56', NULL),
+('1234', 'Subject Description', '1', 'lecture & laboratory', '1', 3, '2023-12-15 13:31:24', NULL),
+('ITPE130', 'Subject Description', '1', 'lecture & laboratory', '1', 3, '2023-12-28 22:20:11', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL,
+  `first_name` varchar(45) NOT NULL,
+  `middle_name` varchar(45) NOT NULL,
+  `last_name` varchar(45) NOT NULL,
+  `birthday` date NOT NULL,
+  `gender` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `contact_number` varchar(15) DEFAULT NULL,
+  `password` varchar(100) NOT NULL,
+  `role` enum('0','1','2') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `first_name`, `middle_name`, `last_name`, `birthday`, `gender`, `email`, `contact_number`, `password`, `role`) VALUES
+(27, 'admin', '', '', '2023-10-04', '', 'admin@gmail.com', NULL, '$2y$10$PumhXShcT5uQ3eviJ2eINuYL9z5R8kLszjQmL6jzrVVoTpfogv5Fa', '0'),
+(71, 'Rayan', 'Maglicious', 'Celestino', '2000-12-27', 'male', 'rayan@gmail.com', '09123456789', '$2y$10$sKfzOvpyo5CyVb6N.4sVM.cvjmHuS.sj..dgz59mx9rz5jpAE4BVC', '2'),
+(72, 'Rubylyn', 'Celistino', 'Lingaolingao', '2003-06-26', 'female', 'rubylyn@gmail.com', '09123456789', '$2y$10$u0pg4Gmh8zeb8hcI2/IoUOvS9g1zLDhETBRvTObiSPxQfb3d4UEqe', '2'),
+(76, 'Jonathan', 'Dee', 'David', '2000-12-27', 'male', 'jonathan@gmail.com', '09123456789', '$2y$10$S6TrG1rqBuDfQfF2iy2LK.27HeScfdiTk2g9sbxfLuJlGKyax.GZu', '1'),
+(77, 'Mica', 'Dee', 'David', '2000-12-27', 'male', 'mica@gmail.com', '09123456789', '$2y$10$VHHXfT58FdJK3kE1URhP5ehX5MFLIB0REktrDo5M/wiFsKZn6yBDG', '1');
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `admin`
---
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`user_id`);
 
 --
 -- Indexes for table `course`
@@ -213,9 +265,17 @@ ALTER TABLE `course`
 -- Indexes for table `faculty`
 --
 ALTER TABLE `faculty`
-  ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`faculty_id`),
   ADD KEY `faculty_institute` (`institute`),
-  ADD KEY `faculty_course` (`course`);
+  ADD KEY `faculty_course` (`course`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `faculty_subjects`
+--
+ALTER TABLE `faculty_subjects`
+  ADD PRIMARY KEY (`faculty_id`,`subject_code`),
+  ADD KEY `subject_id` (`subject_code`);
 
 --
 -- Indexes for table `institute`
@@ -225,28 +285,44 @@ ALTER TABLE `institute`
   ADD UNIQUE KEY `slug` (`slug`);
 
 --
+-- Indexes for table `schoolyear`
+--
+ALTER TABLE `schoolyear`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `students`
 --
 ALTER TABLE `students`
   ADD PRIMARY KEY (`student_id`),
   ADD KEY `student_institute` (`institute`),
-  ADD KEY `student_course` (`course`);
+  ADD KEY `student_course` (`course`),
+  ADD KEY `students_ibfk_1` (`user_id`);
+
+--
+-- Indexes for table `student_subjects`
+--
+ALTER TABLE `student_subjects`
+  ADD PRIMARY KEY (`subject_code`,`student_id`),
+  ADD KEY `student_subjects_ibfk_1` (`student_id`),
+  ADD KEY `student_subjects_ibfk_3` (`faculty_id`);
 
 --
 -- Indexes for table `subjects`
 --
 ALTER TABLE `subjects`
-  ADD PRIMARY KEY (`code`);
+  ADD PRIMARY KEY (`code`),
+  ADD KEY `school_year` (`school_year`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
-
---
--- AUTO_INCREMENT for table `admin`
---
-ALTER TABLE `admin`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `course`
@@ -258,13 +334,25 @@ ALTER TABLE `course`
 -- AUTO_INCREMENT for table `faculty`
 --
 ALTER TABLE `faculty`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `faculty_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `institute`
 --
 ALTER TABLE `institute`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `schoolyear`
+--
+ALTER TABLE `schoolyear`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- Constraints for dumped tables
@@ -281,14 +369,37 @@ ALTER TABLE `course`
 --
 ALTER TABLE `faculty`
   ADD CONSTRAINT `faculty_course` FOREIGN KEY (`course`) REFERENCES `course` (`slug`),
+  ADD CONSTRAINT `faculty_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `faculty_institute` FOREIGN KEY (`institute`) REFERENCES `institute` (`slug`);
+
+--
+-- Constraints for table `faculty_subjects`
+--
+ALTER TABLE `faculty_subjects`
+  ADD CONSTRAINT `faculty_subjects_ibfk_1` FOREIGN KEY (`faculty_id`) REFERENCES `faculty` (`faculty_id`),
+  ADD CONSTRAINT `faculty_subjects_ibfk_2` FOREIGN KEY (`subject_code`) REFERENCES `subjects` (`code`);
 
 --
 -- Constraints for table `students`
 --
 ALTER TABLE `students`
   ADD CONSTRAINT `student_course` FOREIGN KEY (`course`) REFERENCES `course` (`slug`),
-  ADD CONSTRAINT `student_institute` FOREIGN KEY (`institute`) REFERENCES `institute` (`slug`);
+  ADD CONSTRAINT `student_institute` FOREIGN KEY (`institute`) REFERENCES `institute` (`slug`),
+  ADD CONSTRAINT `students_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `student_subjects`
+--
+ALTER TABLE `student_subjects`
+  ADD CONSTRAINT `student_subjects_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`student_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_subjects_ibfk_2` FOREIGN KEY (`subject_code`) REFERENCES `faculty_subjects` (`subject_code`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_subjects_ibfk_3` FOREIGN KEY (`faculty_id`) REFERENCES `faculty` (`faculty_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `subjects`
+--
+ALTER TABLE `subjects`
+  ADD CONSTRAINT `subjects_ibfk_1` FOREIGN KEY (`school_year`) REFERENCES `schoolyear` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

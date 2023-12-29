@@ -47,7 +47,7 @@ class Grades extends Controller
 			exit;
 		}
 
-		response(200, true, $results);
+		response(200, true, ["data" => $results]);
 	}
 }
 new Grades();

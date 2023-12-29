@@ -141,36 +141,6 @@ class GradesModel
 		}
 	}
 	/**
-	 * Update data set based on the condition
-	 * @return bool true if successul
-	 */
-	public static function update(
-		$id,
-		$title,
-		$slug,
-		$description
-	) {
-		try {
-			$query = "UPDATE " . self::TABLE . " SET title = :title, slug = :slug, description = :description WHERE id = :id";
-
-			$stmt = Database::connect()->prepare($query);
-
-			$stmt->bindParam(":id", $id);
-			$stmt->bindParam(":title", $title);
-			$stmt->bindParam(":slug", $slug);
-			$stmt->bindParam(":description", $description);
-
-			$result = $stmt->execute() ? true : false;
-			return $result;
-		} catch (PDOException $e) {
-			$response = [
-				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
-			];
-			response(500, false, $response);
-			exit;
-		}
-	}
-	/**
 	 * Delete data on the database
 	 * @return bool true if successful
 	 */
@@ -313,6 +283,31 @@ class GradesModel
 
 			$stmt->bindParam(":studentId", $studentId);
 			$stmt->bindParam(":subjectCode", $subjectcode);
+
+			$result = $stmt->execute() ? true : false;
+
+			return $result;
+		} catch (PDOException $e) {
+			$response = [
+				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+			];
+			response(500, false, $response);
+			exit;
+		}
+	}
+	public static function addGrades($subjectcode, $studentId, $faculty_id, $grade)
+	{
+		try {
+			//query statement
+			$query = "UPDATE " . self::TABLE . "SET grades = :grades WHERE student_id = :studentId AND subject_code = :subjectCode AND faculty_id = :facultyId";
+
+			//prepared statement
+			$stmt = Database::connect()->prepare($query);
+
+			$stmt->bindParam(":studentId", $studentId);
+			$stmt->bindParam(":subjectCode", $subjectcode);
+			$stmt->bindParam(":facultyId", $faculty_id);
+			$stmt->bindParam(":grades", $grade);
 
 			$result = $stmt->execute() ? true : false;
 

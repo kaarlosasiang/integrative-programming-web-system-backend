@@ -64,7 +64,7 @@ class FacultyModel
 	{
 		try {
 			//query statement
-			$query = "SELECT * FROM " . self::TABLE . " JOIN users on faculty.user_id = users.user_id  WHERE $condition = :$condition";
+			$query = "SELECT * FROM " . self::TABLE . " JOIN users on faculty.user_id = users.user_id  WHERE faculty.$condition = :$condition";
 
 			//prepared statement
 			$stmt = Database::connect()->prepare($query);

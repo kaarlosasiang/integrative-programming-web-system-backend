@@ -3,49 +3,44 @@
 namespace api\admin;
 
 use api\Controller;
+use model\UserModel;
+use model\GradesModel;
 use model\FacultyModel;
 use model\StudentModel;
-use model\InstituteModel;
+use model\SubjectModel;
+use model\SchoolYearModel;
 use middleware\AuthMiddleware;
+use model\FacultySubjectsModel;
 
+require_once(__DIR__ . "/../../model/SubjectModel.php");
 require_once(__DIR__ . "/../../model/FacultyModel.php");
-require_once(__DIR__ . "/../../model/InstituteModel.php");
+require_once(__DIR__ . "/../../model/GradesModel.php");
 require_once(__DIR__ . "/../../model/StudentModel.php");
+require_once(__DIR__ . "/../../model/FacultySubjectsModel.php");
 require_once(__DIR__ . "/../../middleware/AuthMiddleware.php");
 require_once(__DIR__ . "/../Controller.php");
 
-class Institute extends Controller
+class Grades extends Controller
 {
 	private $authResult;
 	public function __construct()
 	{
 		$this->authResult = AuthMiddleware::authenticate();
-		//verify user role
-		Controller::verifyRole($this->authResult, Controller::FACULTY_ROLE);
 
+		Controller::verifyRole($this->authResult, Controller::FACULTY_ROLE);
 		$requestMethod = $_SERVER["REQUEST_METHOD"];
 
 		switch ($requestMethod) {
-			case "POST": {
-					$this->create();
-					break;
-				}
 			case "GET": {
-					if (array_key_exists("id", $_GET) || !empty($_GET["id"])) {
+					if (array_key_exists("code", $_GET) || !empty($_GET["code"])) {
 						$this->show();
-					} else if (array_key_exists("query", $_GET) || !empty($_GET["query"])) {
-						$this->search();
-					} else {
+					} else if (array_key_exists("id", $_GET) || !empty($_GET["id"])) {
 						$this->all();
 					}
 					break;
 				}
 			case "PATCH": {
-					$this->update();
-					break;
-				}
-			case "DELETE": {
-					$this->delete();
+					$this->addGrades();
 					break;
 				}
 			default: {
@@ -54,112 +49,159 @@ class Institute extends Controller
 				}
 		}
 	}
-	public function create()
-	{
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
-		$faculty = FacultyModel::fetchId($id, "user_id")["faculty_id"];
-	}
 	public function show()
 	{
 		$id = isset($_GET["id"]) ? $_GET["id"] : null;
 
-		$results = InstituteModel::find($id, "id");
-
-		if (!$results) {
-			response(404, false, ["message" => "Institute not found!"]);
+		if ($id !== $this->authResult) {
+			response(403, false, ["message" => "Unauthorized"]);
 			exit;
 		}
 
-		response(200, true, $results);
-	}
-	public function search()
-	{
-		$query = isset($_GET["query"]) ? $_GET["query"] : null;
+		$faculty = FacultyModel::find($id, "user_id");
 
-		$results = InstituteModel::search($query);
-
-		if (!$results) {
-			response(404, false, ["message" => "Institute not found!"]);
+		if (!$faculty) {
+			response(404, false, ["message" => "Faculty not found!"]);
 			exit;
 		}
 
-		response(200, true, ["data" => $results]);
+		$code = isset($_GET["code"]) ? $_GET["code"] : null;
+
+		$subject = SubjectModel::find($code, "code");
+
+		if (!$subject) {
+			response(404, false, ["message" => "Subject not found!"]);
+			exit;
+		}
+		// $facultyName = $faculty["first_name"] . " " . $faculty["middle_name"] . " " . $faculty["last_name"];
+
+		//fetch students based on enrolled subject and faculty
+		$fetchAssignedStudents = GradesModel::where([
+			"subject_code" => $code,
+			"faculty_id" => $faculty["faculty_id"]
+		], true);
+
+		if (!$fetchAssignedStudents) {
+			response(200, true, ["message" => "No enrolled students currently!"]);
+			exit;
+		}
+		//initialized return data
+		$returnData = [];
+
+		//loop through enrolled students
+		foreach ($fetchAssignedStudents as $assignedStudent) {
+			$studentName = StudentModel::find($assignedStudent["student_id"], "student_id");
+			$studentName = UserModel::find($studentName["user_id"], "user_id");
+			// Format fullname
+			$middlename = substr($studentName["middle_name"], 0, 1) . ".";
+			$fullname = $studentName["first_name"] . " $middlename " . $studentName["last_name"];
+
+			$returnData[] = [
+				"student_id" => $assignedStudent["student_id"],
+				"fullname" => $fullname,
+				"subject_code" => $assignedStudent["subject_code"],
+				"grade" => $assignedStudent["grades"]
+			];
+		}
+
+		response(200, true, ["data" => $returnData]);
 	}
 	public function all()
 	{
-		$results = InstituteModel::all();
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
+
+		if ($id !== $this->authResult) {
+			response(403, false, ["message" => "Unauthorized"]);
+			exit;
+		}
+
+		$faculty = FacultyModel::fetchId($id, "user_id")["faculty_id"];
+
+		$results = FacultySubjectsModel::find($faculty, "faculty_id", true);
 
 		if (!$results) {
-			response(200, false, ["message" => "No registered institute currently"]);
+			response(200, false, ["message" => "No registered subjects currently"]);
 			exit;
+		}
+
+		foreach ($results as $result) {
+			$subjectInfo = SubjectModel::find($result["subject_code"], "code");
+
+			$schoolyear = SchoolYearModel::find($subjectInfo["school_year"], "id")["school_year"];
+
+			//fetch faculty fullname
+			$userInfo = UserModel::find($id, "user_id");
+			$middlename = substr($userInfo["middle_name"], 0, 1) . ".";
+			$facultyName =  $userInfo["first_name"] . " $middlename " . $userInfo["last_name"];
+
+			$returnData[] = [
+				"code" => $subjectInfo["code"],
+				"description" => $subjectInfo["description"],
+				"unit" => $subjectInfo["unit"],
+				"type" => $subjectInfo["type"],
+				"status" => $subjectInfo["status"],
+				"school_year" => $schoolyear,
+				"faculty" => $facultyName
+			];
 		}
 
 		$numRows = count($results);
 
-		foreach ($results as $result) {
-
-			$returnData[] = [
-				"id" => $result["id"],
-				"title" => $result["title"],
-				"slug" => $result["slug"],
-				"description" => $result["description"]
-			];
-		}
 		response(200, true, ["row_count" => $numRows, "data" => $returnData]);
 	}
-	public function update()
+	public function addGrades()
 	{
-		$data = json_decode(file_get_contents("php://input"));
 
+		$id = isset($_GET["id"]) ? $_GET["id"] : null;
+
+		if ($id !== $this->authResult) {
+			response(403, false, ["message" => "Unauthorized"]);
+			exit;
+		}
+
+		$faculty = FacultyModel::find($id, "user_id");
+
+		if (!$faculty) {
+			response(404, false, ["message" => "Faculty not found!"]);
+			exit;
+		}
+
+		$code = isset($_GET["code"]) ? $_GET["code"] : null;
+
+		$subject = SubjectModel::find($code, "code");
+
+		if (!$subject) {
+			response(404, false, ["message" => "Subject not found!"]);
+			exit;
+		}
+
+		$data = json_decode(file_get_contents("php://input"));
 		Controller::verifyJsonData($data);
 
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
+		$studentId = $data->student_id;
+		$grades = $data->grade;
 
-		//set json data from request body
-		$title = $data->title;
-		$slug = $data->slug;
-		$description = $data->description;
+		//fetch students based on enrolled subject and faculty
+		$fetchAssignedStudents = GradesModel::where([
+			"subject_code" => $code,
+			"faculty_id" => $faculty["faculty_id"],
+			"student_id" => $studentId
+		]);
 
-
-		if (!InstituteModel::find($id, "id")) {
-			response(404, false, ["message" => "Institute not found!"]);
+		if (!$fetchAssignedStudents) {
+			response(404, false, ["message" => "Student not found!"]);
 			exit;
 		}
 
-		$result = InstituteModel::update($id, $title, $slug, $description);
+		$result = GradesModel::addGrades($code, $studentId, $faculty["faculty_id"], $grades);
 
 		if (!$result) {
-			response(400, false, ["message" => "Update failed!"]);
-			exit;
-		} else {
-			response(201, true, ["message" => "Update successfull!"]);
-		}
-	}
-	public function delete()
-	{
-		$id = isset($_GET["id"]) ? $_GET["id"] : null;
-
-		$results = InstituteModel::find($id, "id");
-
-		if (!$results) {
-			response(404, false, ["message" => "Institute not found!"]);
-			exit;
-		}
-		//verify if student is enrolled in the institute
-		$studentByMajor = StudentModel::find($results["slug"], "institute");
-
-		if ($studentByMajor) {
-			response(400, false, ["message" => "Students are enrolled in this institute"]);
+			response(400, false, ["message" => "Failed to add grades"]);
 			exit;
 		}
 
-
-		if (InstituteModel::delete($id, "id")) {
-			response(200, true, ["message" => "Delete successful"]);
-		} else {
-			response(400, false, ["message" => "Delete Failed!"]);
-		}
+		response(200, true, ["message" => "Successfully added grades"]);
 	}
 }
-new Institute();
+new Grades();
