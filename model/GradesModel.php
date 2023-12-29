@@ -302,4 +302,27 @@ class GradesModel
 
 		return $whereClause;
 	}
+	public static function unenroll($studentId, $subjectcode)
+	{
+		try {
+			//query statement
+			$query = "DELETE FROM " . self::TABLE . " WHERE student_id = :studentId AND subject_code = :subjectCode";
+
+			//prepared statement
+			$stmt = Database::connect()->prepare($query);
+
+			$stmt->bindParam(":studentId", $studentId);
+			$stmt->bindParam(":subjectCode", $subjectcode);
+
+			$result = $stmt->execute() ? true : false;
+
+			return $result;
+		} catch (PDOException $e) {
+			$response = [
+				"message" => "Error: {$e->getMessage()} on line {$e->getLine()}"
+			];
+			response(500, false, $response);
+			exit;
+		}
+	}
 }

@@ -55,12 +55,13 @@ class Grades extends Controller
 					}
 					break;
 				}
-			case "PATCH": {
-					$this->update();
-					break;
-				}
 			case "DELETE": {
-					$this->delete();
+					if (array_key_exists("action", $_GET) && $_GET["action"] == "unenroll") {
+						// echo "2";
+						$this->unenrollStudent();
+					} else {
+						$this->unassignFaculty();
+					}
 					break;
 				}
 			default: {
@@ -81,7 +82,10 @@ class Grades extends Controller
 		$facultyId = $data->facultyId;
 		$studentId = $data->studentId;
 
-		$facultyAssignedSubjects = FacultySubjectsModel::find($facultyId, "faculty_id", true);
+		$facultyAssignedSubjects = FacultySubjectsModel::where([
+			"faculty_id" => $facultyId,
+			"subject_code" => $code
+		]);
 
 		if (!$facultyAssignedSubjects) {
 			response(200, false, ["message" => "Subject is not handled by the faculty chosen!"]);
@@ -92,7 +96,6 @@ class Grades extends Controller
 			"faculty_id" => $facultyId,
 			"subject_code" => $code
 		]);
-
 
 		if ($isStudentAssigned) {
 			response(409, false, ["message" => "Student is already enrolled to this subject!"]);
@@ -119,6 +122,17 @@ class Grades extends Controller
 		$code = $data->subjectCode;
 
 		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
+
+		$facultyAssignedSubjects = FacultySubjectsModel::where([
+			"faculty_id" => $facultyId,
+			"subject_code" => $code
+		]);
+
+		if ($facultyAssignedSubjects) {
+			response(200, false, ["message" => "Subject is already assigned to faculty!"]);
+			exit;
+		}
+
 
 		$result = FacultySubjectsModel::create($code, $facultyId);
 
@@ -317,6 +331,70 @@ class Grades extends Controller
 		$faculty = UserModel::find($facultyUserId, "user_id");
 		$middlename = substr($faculty["middle_name"], 0, 1) . ".";
 		return $faculty["first_name"] . " $middlename " . $faculty["last_name"];
+	}
+	public function unassignFaculty()
+	{
+
+		$facultyId = isset($_GET["id"]) ? $_GET["id"] : null;
+		$code = isset($_GET["code"]) ? $_GET["code"] : null;
+
+		$faculty = FacultyModel::find($facultyId, "faculty_id");
+
+		if (!$faculty) {
+			response(404, false, ["message" => "Faculty is not found!"]);
+			exit;
+		}
+
+		$subject = SubjectModel::find($code, "code");
+		if (!$subject) {
+			response(404, false, ["message" => "Subject is not found!"]);
+			exit;
+		}
+		// fetch students based on enrolled subject and faculty
+		$fetchAssignedStudents = GradesModel::where([
+			"subject_code" => $code,
+			"faculty_id" => $facultyId
+		], false, "AND");
+
+		if ($fetchAssignedStudents) {
+			response(200, true, ["message" => "Cannot unassign faculty, students are enrolled to the subject!"]);
+			exit;
+		}
+
+		$unassign = FacultySubjectsModel::unassign($facultyId, $code);
+
+		if (!$unassign) {
+			response(400, false, ["message" => "Failed to unassign faculty"]);
+			exit;
+		}
+		response(200, true, ["message" => "Successfully unassigned faculty!"]);
+	}
+	public function unenrollStudent()
+	{
+		$studentId = isset($_GET["id"]) ? $_GET["id"] : null;
+		$code = isset($_GET["code"]) ? $_GET["code"] : null;
+
+		$student = StudentModel::find($studentId, "student_id");
+
+		if (!$student) {
+			response(404, false, ["message" => "Student is not found!"]);
+			exit;
+		}
+
+		$subject = SubjectModel::find($code, "code");
+		if (!$subject) {
+			response(404, false, ["message" => "Subject is not found!"]);
+			exit;
+		}
+
+		$unenroll = GradesModel::unenroll($studentId, $code);
+
+		if (!$unenroll) {
+			response(400, false, ["message" => "Failed to unenroll student!"]);
+			exit;
+		}
+
+		response(200, true, ["message" => "Student successfuly unenrolled!"]);
 	}
 }
 new Grades();
